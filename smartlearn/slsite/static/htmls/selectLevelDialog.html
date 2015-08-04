@@ -1,0 +1,44 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+  <h4 class="modal-title">选择科目和级别</h4>
+</div>
+<div class="modal-body selectLevelDialogBodySection">
+  <div style="font-size:18px;">
+    科目: {{ subject }}
+  </div>
+  <div id="subjectLevelTable">
+      <hr />
+      <table style="table-layout:fixed;">
+        <tr>
+            <td style="vertical-align:top">
+                <h4 class="control-label"> 级别列表 </h4>
+                 <div class="col-md-12 levelList pre-scrollable" style="height:200px;border-style:groove">
+                    <div ng-repeat="level in subjectLevels" style="margin-top:10px">
+                        <label class="btn btn-primary">
+                            <input type="radio" name="options"
+                                   id="{{ level.sbj_name }}_{{level.level}}"
+                                   ng-click="selectLevel(level)"> 级别 {{level.level}}
+                        </label>
+                    </div>
+                </div>
+            </td>
+
+            <td>
+                <div class="col-md-1" />
+            </td>
+
+            <td style="vertical-align:top">
+                <h4 class="control-label"> 级别描述 </h4>
+                <div class="col-md-12 pre-scrollable col-md-12"
+                     style="height:200px;border-style:groove">
+                  {{ currLevel.desc }}
+                </div>
+            </td>
+        </tr>
+      </table>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+  <button type="button" class="btn btn-primary" id="btnOK" ng-click="createChallenge()">确定</button>
+</div>

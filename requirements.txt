@@ -1,0 +1,11 @@
+# Pypi requirements for smartlearn to work
+
+# web framework.
+django
+
+# database.
+mongodb
+
+# All new style configurations are in the yaml format
+pyyaml
+

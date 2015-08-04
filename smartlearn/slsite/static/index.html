@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="en"  ng-app="smartlearn">
+<head>
+    <meta charset="utf-8">
+    <title>SmartLearn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+
+    <!-- common js/css lib -->
+    <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet"  type="text/css" />  
+    <link href="lib/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet"  type="text/css" />  
+
+    <script src="lib/jquery/jquery-2.1.0.min.js"></script>
+    <script src="lib/jquery/jquery.dataTables.js"></script>
+    <script src="lib/jquery/jquery.validate.min.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="lib/angular/angular.js"></script>
+    <script src="lib/angular/angular-route.js"></script>
+    <script src="lib/angular/angular-resource.js"></script>
+	
+    <!-- application js/css files -->
+    <link href="stylesheets/style.css" rel="stylesheet" type="text/css" />  
+
+    <script src="ngrouter.js"></script>
+    <script src="javascripts/controllers/userMgmtController.js"></script> 
+    <script src="javascripts/controllers/studyMgmtController.js"></script>
+    <script src="javascripts/services/smartLearnService.js"></script>
+</head>
+
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">                                   
+                <ul class="nav navbar-nav">
+					<li><a class="navbar-brand" href="/static/index.html">SmartLearn</a></li>
+		            <li><a class="textsize2" href="#/">首页</a></li>
+                </ul>
+	        </div>
+	        <div id="regLoginBtn" style="float:right">  
+                <ul class="nav navbar-nav">
+                    <li><a class="textsize2" href="#/login">登录</a></li>
+                    <li><a class="textsize2" href="#/reg">注册</a></li>
+                </ul>
+            </div> 
+	        <div id="logoutBtn" style="float:right;display:none">  
+                <ul class="nav navbar-nav">
+                    <li><a class="textsize2" href="#/userInfo" id="currUser"></a></li>
+                    <li><a class="textsize2" href="#/logout">注销</a></li>
+                </ul>
+            </div>   			      		 
+        </div>
+    </div>
+
+    <div id="wrap">
+		<div class="container">
+			<div ng-view></div>
+		</div>
+    </div>
+
+    <div id="footer">
+	    <div class="container">
+            <div class="text-muted textsize1 credit"> All rights reserved by zxn. </div>
+        </div>
+    </div>
+
+</body>
+</html>

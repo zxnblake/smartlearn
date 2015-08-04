@@ -1,0 +1,236 @@
+<div>
+    <h2>欢迎来到智慧学习 !</h2>
+    <div>
+        <hr />
+        <table>
+            <tr>
+                <td>
+                    <a type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#homeworkHistoryDialog"
+                        ng-click="showHomeworkHistoryDialog()">历史作业</a>
+                </td>
+                <td>
+                    <div class="col-md-1" />
+                </td>
+                <td>
+                    <a type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#taskDialog"
+                        ng-click="showHomeworkDialog()">今日作业</a>
+                </td>
+                <td>
+                    <div class="col-md-1" />
+                </td>
+                <td>
+                    <a type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#selectLevelDialog">挑战级别</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="modal fade" id="selectLevelDialog" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">选择科目和级别</h4>
+            </div>
+            <div class="modal-body selectLevelDialogBodySection">
+              <div style="font-size:18px;">
+                科目: {{ subject }}
+              </div>
+              <div id="subjectLevelTable">
+                  <hr />
+                  <table style="table-layout:fixed;">
+                    <tr>
+                        <td style="vertical-align:top">
+                            <h4 class="control-label"> 级别列表 </h4>
+                             <div class="col-md-12 levelList pre-scrollable" style="height:200px;border-style:groove">
+                                <div ng-repeat="level in subjectLevels" style="margin-top:10px">
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="options"
+                                               id="{{ level.sbj_name }}_{{level.level}}"
+                                               ng-click="selectLevel(level)"> 级别 {{level.level}}
+                                    </label>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="col-md-1" />
+                        </td>
+
+                        <td style="vertical-align:top">
+                            <h4 class="control-label"> 级别描述 </h4>
+                            <div class="col-md-12 pre-scrollable col-md-12"
+                                 style="height:200px;border-style:groove">
+                              {{ currLevel.desc }}
+                            </div>
+                        </td>
+                    </tr>
+                  </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary" id="btnOK" ng-click="createChallenge()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="taskDialog" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{ taskDialogTitle }}</h4>
+                <table>
+                   <tr>
+                       <td>
+                            <h4 id="time_count">计时 : {{ taskQuestions.time_used }}</h4>
+                       </td>
+                       <td>
+                            <div style="width:350px" />
+                       </td>
+                       <td>
+                            <h4 style="float:right">分数 : {{ taskQuestions.score }}</h4>
+                       </td>
+                   </tr>
+                </table>
+            </div>
+            <div id="questionsTable" class="modal-body challengeDialogBodySection" style="height:320px;">
+                <h4> 题目列表 </h4>
+                <div class="col-md-12 pre-scrollable" style="height:240px;border-style:groove">
+                    <table>
+                    <tr>
+                    <td>
+                    <table>
+                        <tr ng-repeat="question in taskQuestions.questions | filter:questionLeft5" >
+                            <td>
+                                <h4>{{ question.content }}</h4>
+                            </td>
+                            <td>
+                                <div class="col-md-1" />
+                            </td>
+                            <td>
+                                <input type="text" id="answer_{{ question.question_id }}"
+                                       style="width:100px" disabled="true"
+                                       value="{{ question.user_answer }}"/>
+                            </td>
+                            <td>
+                                <div style="width:10px" />
+                            </td>
+                            <td>
+                                <img id="image_result_{{ question.question_id }}"
+                                     style="height:20px;width:20px;visibility:hidden"
+                                     ng-click="correctError(question)" />
+                            </td>
+                        </tr>
+                    </table>
+                    </td>
+                    <td>
+                        <div class="col-md-1" />
+                    </td>
+                    <td>
+                    <table>
+                        <tr ng-repeat="question in taskQuestions.questions | filter:questionRight5">
+                            <td>
+                                <h4>{{ question.content }}</h4>
+                            </td>
+                            <td>
+                                <div class="col-md-1" />
+                            </td>
+                            <td>
+                                <input type="text" id="answer_{{ question.question_id }}"
+                                       style="width:100px" disabled="true"
+                                       value="{{ question.user_answer }}"/>
+                            </td>
+                            <td>
+                                <div style="width:10px" />
+                            </td>
+                            <td>
+                                <img id="image_result_{{ question.question_id }}"
+                                     style="height:20px;width:20px;visibility:hidden"
+                                     ng-click="correctError(question)" />
+                            </td>
+                        </tr>
+                    </table>
+                    </td>
+                    </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" id="btnStartTask"
+                      ng-click="startChallenge()" ng-disabled="isHistoryView || !notStarted">开始</button>
+              <button type="button" class="btn btn-primary" id="btnComplete"
+                      ng-click="completeChallenge()" ng-disabled="isHistoryView || notStarted">完成</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="homeworkHistoryDialog" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" style="height: 600px">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">历史作业列表</h4>
+            </div>
+            <div class="modal-body homeworkHistoryDialogBodySection">
+              <div id="homeworkHistoryTable" class=" pre-scrollable" style="height: 320px">
+                  <table class="col-md-12 homeworkList" style="table-layout:fixed;">
+                    <tr style="background-color: darkgray">
+                        <td>
+                            <h5>日期</h5>
+                        </td>
+                        <td>
+                            <h5>科目</h5>
+                        </td>
+                        <td>
+                            <h5>题数</h5>
+                        </td>
+                        <td>
+                            <h5>用时</h5>
+                        </td>
+                        <td>
+                            <h5>分数</h5>
+                        </td>
+                    </tr>
+                    <tr ng-style="{'background-color': getBgColor(hw) }" ng-repeat="hw in homeworkList" >
+                        <td>
+                            <button type="button" class="btn btn-link"
+                                    ng-click="showHomeworkDetail(hw)"
+                                    data-toggle="modal" data-target="#taskDialog">
+                                {{ hw.date }}
+                            </button>
+                        </td>
+                        <td>
+                            <h5>{{ hw.sbj_name }}</h5>
+                        </td>
+                        <td>
+                            <h5>{{ hw.question_num }}</h5>
+                        </td>
+                        <td>
+                            <h5>{{ hw.time_used }}</h5>
+                        </td>
+                        <td>
+                            <h5>{{ hw.score }}</h5>
+                        </td>
+                    </tr>
+                  </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="messageDialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>

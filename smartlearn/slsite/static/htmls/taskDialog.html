@@ -1,0 +1,82 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">{{ taskDialogTitle }}</h4>
+    <table>
+       <tr>
+           <td>
+                <h4 id="time_count">计时 : {{ timeUsedStr }}</h4>
+           </td>
+           <td>
+                <div style="width:350px" />
+           </td>
+           <td>
+                <h4 style="float:right">分数 : {{ taskQuestions.score }}</h4>
+           </td>
+       </tr>
+    </table>
+</div>
+<div id="questionsTable" class="modal-body challengeDialogBodySection" style="height:320px;">
+    <h4> 题目列表 </h4>
+    <div class="col-md-12 pre-scrollable" style="height:240px;border-style:groove">
+        <table>
+        <tr>
+        <td>
+        <table>
+            <tr ng-repeat="question in taskQuestions.questions | filter:questionLeft5" >
+                <td>
+                    <h4>{{ question.content }}</h4>
+                </td>
+                <td>
+                    <div class="col-md-1" />
+                </td>
+                <td>
+                    <input type="text" id="answer_{{ question.question_id }}"
+                           style="width:100px" disabled="true"/>
+                </td>
+                <td>
+                    <div style="width:10px" />
+                </td>
+                <td>
+                    <img id="image_result_{{ question.question_id }}"
+                         style="height:20px;width:20px;visibility:hidden"
+                         ng-click="correctError(question)" />
+                </td>
+            </tr>
+        </table>
+        </td>
+        <td>
+            <div class="col-md-1" />
+        </td>
+        <td>
+        <table>
+            <tr ng-repeat="question in taskQuestions.questions | filter:questionRight5">
+                <td>
+                    <h4>{{ question.content }}</h4>
+                </td>
+                <td>
+                    <div class="col-md-1" />
+                </td>
+                <td>
+                    <input type="text" id="answer_{{ question.question_id }}"
+                           style="width:100px" disabled="true"/>
+                </td>
+                <td>
+                    <div style="width:10px" />
+                </td>
+                <td>
+                    <img id="image_result_{{ question.question_id }}"
+                         style="height:20px;width:20px;visibility:hidden"
+                         ng-click="correctError(question)" />
+                </td>
+            </tr>
+        </table>
+        </td>
+        </tr>
+        </table>
+    </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" id="btnStart" ng-click="startChallenge()">开始</button>
+  <button type="button" class="btn btn-primary" id="btnComplete"
+          ng-click="completeChallenge()" ng-disabled="testNotStarted()">完成</button>
+</div>
