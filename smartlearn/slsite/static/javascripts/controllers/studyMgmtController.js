@@ -11,6 +11,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
         $scope.subject = "数学";
         $scope.subjectLevels = [];
         $scope.currLevel = {};
+        $scope.currLevelName = '1';
         $scope.taskQuestions = [];
         $scope.userAssessment = {};
 
@@ -24,6 +25,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
         $scope.selectLevelDialog = angular.element('#selectLevelDialog');
         $scope.dataReady = false;
     	$scope.isHistoryView = false;
+    	$scope.challengeResultMsg = '';
 
         $scope.messageTitle = '消息';
         $scope.messageText = '错误出现，请检查！';
@@ -53,7 +55,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
     	$scope.showHomeworkDialog = function()
 	  	{
             var sbjAssessMap = $scope.userAssessment['sbjAssessMap']
-    		$scope.currLevel.level = sbjAssessMap[$scope.subject]['next_level'];
+    		$scope.currLevelName = sbjAssessMap[$scope.subject]['next_level'];
             $scope.taskDialogTitle = '今日作业';
             $scope.createTask(TASK_TYPE_HOMEWORK);
 	  	};
@@ -61,6 +63,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
         $scope.selectLevel = function(level)
 	  	{
     		$scope.currLevel = level;
+            $scope.currLevelName = level.level;
 	  	};
 
         $scope.getBgColor = function(homework)
@@ -73,7 +76,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
             return '#67b168';
 	  	};
 
-        $scope.startChallenge = function()
+        $scope.startTask = function()
 	  	{
     		$scope.notStarted = false;
             $scope.startedTime = new Date().getTime();
@@ -102,7 +105,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
             }
         }
 
-        $scope.completeChallenge = function()
+        $scope.completeTask = function()
 	  	{
             $scope.endTime = new Date().getTime();
             window.clearInterval(timerVar);
@@ -140,6 +143,18 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 				function(resp)
 				{
 					console.log("Result is submitted successfully!");
+                    if ( $scope.taskQuestions.type == TASK_TYPE_CHALLENGE )
+                    {
+                        if (resp.code == '1000')
+                        {
+                            $scope.messageText = '挑战成功！升到级别：' + $scope.taskQuestions.level + ' !';
+                        }
+                        else
+                        {
+                            $scope.messageText = '挑战失败';
+                        }
+                        window.parent.$('#messageDialog').modal('show');
+                    }
 				},
 				function(err)
 				{
@@ -200,6 +215,10 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                         }
                         else
                         {
+                            if ( i < 3 )
+                            {
+			                    console.log("set correct image: ");
+                            }
                             question.correct = 'true';
                             check_result_image.src = "images/correct.png";
                             answerElement.disabled = true;
@@ -211,7 +230,17 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 			console.log("dialog display: " + dialog);
 		};
 
-		$scope.getSubjectLevels = function()
+        $scope.disableLevel = function(level)
+        {
+            userLevel = sbjAssessMap[$scope.subject]['level'];
+            if (userLevel >= level.level)
+            {
+                return true;
+            }
+            return false;
+        };
+
+        $scope.getSubjectLevels = function()
 		{
 			smartLearnService.getSubjLevels({subject: $scope.subject},
 				function(resp)
@@ -254,23 +283,25 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 			);
 		};
 
-        $scope.questionLeft5 = function(question)
+        $scope.questionLeftSide = function(question)
         {
             var questions = $scope.taskQuestions.questions;
             var idx = questions.indexOf(question);
-            return (idx < 5)
+            var questNum = questions.length;
+            return (idx < (questNum / 2));
         }
 
-        $scope.questionRight5 = function(question)
+        $scope.questionRightSide = function(question)
         {
             var questions = $scope.taskQuestions.questions;
             var idx = questions.indexOf(question);
-            return ( idx >= 5 && idx < 10 )
+            var questNum = questions.length;
+            return ( idx >= (questNum / 2) && idx < questNum );
         }
 
         $scope.createChallenge = function()
         {
-            $scope.taskDialogTitle = '挑战级别 : ' + $scope.currLevel.level;
+            $scope.taskDialogTitle = '挑战级别 : ' + $scope.currLevelName;
             window.parent.$('#selectLevelDialog').modal('hide');
             $scope.createTask(TASK_TYPE_CHALLENGE)
         }
@@ -281,7 +312,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
             $scope.timeUsedStr = "0 分 0 秒";
     		$scope.notStarted = true;
             var param = {userName: $scope.currUser, subject: $scope.subject,
-                levelName: $scope.currLevel.level, taskType: taskType};
+                levelName: $scope.currLevelName, taskType: taskType};
 			smartLearnService.createTask(param,
 				function(resp)
 				{

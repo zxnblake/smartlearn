@@ -37,6 +37,7 @@ class Task(Document):
     type = StringField()
     user_name = StringField(max_length=128)
     sbj_name = StringField(max_length=128)
+    level = StringField(max_length=4)
     date = StringField()
     create_time = StringField()
     start_time = StringField()

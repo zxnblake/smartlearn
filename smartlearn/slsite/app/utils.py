@@ -20,6 +20,7 @@ def to_task_dict(task):
     d['type'] = task.type
     d['user_name'] = task.user_name
     d['sbj_name'] = task.sbj_name
+    d['level'] = task.level
     d['date'] = task.date
     d['create_time'] = task.create_time
     d['start_time'] = task.start_time

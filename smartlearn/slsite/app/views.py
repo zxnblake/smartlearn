@@ -152,19 +152,23 @@ def create_task(request):
     levelName = req['levelName']
     taskType = req['taskType']
 
+    questNum = 10;
+    if taskType == 'challenge':
+        questNum = 6;
+
     try:
         # 1. select 10 questions by the given level
         questions = __get_questions_by_level(subject, levelName)
-        selectedQuestions = __select_rand_questions(questions, 10)
+        selectedQuestions = __select_rand_questions(questions, questNum)
         print('selectedQuestions =')
         print(selectedQuestions)
 
         # 2. create a new task record
         today = datetime.date.today()
         ctime = int(time.time())
-        taskNew = Task(type=taskType, user_name=userName, sbj_name=subject,
+        taskNew = Task(type=taskType, user_name=userName, sbj_name=subject, level=levelName,
                     date=str(today), create_time=str(ctime), time_used='',
-                    time_limit='', question_num='10', score='')
+                    time_limit='', question_num=str(questNum), score='')
         taskNew.save()
         tasks = Task.objects(user_name=userName, sbj_name=subject,
                             create_time=str(ctime))
@@ -248,6 +252,9 @@ def submit_result(request):
     timeUsed = taskSubmit['time_used']
     score = taskSubmit['score']
     questions = taskSubmit['questions']
+    subject = taskSubmit['sbj_name']
+    level = taskSubmit['level']
+    userName = taskSubmit['user_name']
 
     try:
         tasks = Task.objects(id=taskid)
@@ -272,6 +279,14 @@ def submit_result(request):
         resp['result'] = "error"
         resp['code'] = 99
         resp['message'] = "error occurred when querying database"
+
+    if score == 100:
+        assessments = Assessment.objects(user_name=userName, sbj_name=subject)
+        assess = assessments[0]
+        nextlevel = str(int(level) + 1)
+        assess.update(level=level, next_level=nextlevel)
+        resp['code'] = '1000';
+        print('succeed to pass the challenge, upgrade to the new level: ' + nextlevel)
 
     respstr = simplejson.dumps(resp)
     print(respstr)

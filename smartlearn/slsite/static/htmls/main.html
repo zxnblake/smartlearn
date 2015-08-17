@@ -42,16 +42,16 @@
               </div>
               <div id="subjectLevelTable">
                   <hr />
-                  <table style="table-layout:fixed;">
+                  <table>
                     <tr>
-                        <td style="vertical-align:top">
+                        <td style="vertical-align:top;width: 250px">
                             <h4 class="control-label"> 级别列表 </h4>
                              <div class="col-md-12 levelList pre-scrollable" style="height:200px;border-style:groove">
                                 <div ng-repeat="level in subjectLevels" style="margin-top:10px">
-                                    <label class="btn btn-primary">
+                                    <label class="btn btn-primary" style="width: 200px">
                                         <input type="radio" name="options"
                                                id="{{ level.sbj_name }}_{{level.level}}"
-                                               ng-click="selectLevel(level)"> 级别 {{level.level}}
+                                               ng-click="selectLevel(level)" ng-disabled="disableLevel(level)"> 级别 {{level.level}}
                                     </label>
                                 </div>
                             </div>
@@ -61,11 +61,11 @@
                             <div class="col-md-1" />
                         </td>
 
-                        <td style="vertical-align:top">
+                        <td style="vertical-align:top;width: 250px">
                             <h4 class="control-label"> 级别描述 </h4>
-                            <div class="col-md-12 pre-scrollable col-md-12"
+                            <div class="col-md-12 pre-scrollable"
                                  style="height:200px;border-style:groove">
-                              {{ currLevel.desc }}
+                              <div style="margin-top:10px">{{ currLevel.desc }}</div>
                             </div>
                         </td>
                     </tr>
@@ -81,7 +81,7 @@
 </div>
 <div class="modal fade" id="taskDialog" tabindex="-1" role="dialog"
          aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width: 680px">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -107,12 +107,15 @@
                     <tr>
                     <td>
                     <table>
-                        <tr ng-repeat="question in taskQuestions.questions | filter:questionLeft5" >
+                        <tr ng-repeat="question in taskQuestions.questions | filter:questionLeftSide" >
                             <td>
                                 <h4>{{ question.content }}</h4>
                             </td>
                             <td>
-                                <div class="col-md-1" />
+                                <div style="width:10px" />
+                            </td>
+                            <td>
+                                <div style="width:25px"><h4> = </h4></div>
                             </td>
                             <td>
                                 <input type="text" id="answer_{{ question.question_id }}"
@@ -135,12 +138,15 @@
                     </td>
                     <td>
                     <table>
-                        <tr ng-repeat="question in taskQuestions.questions | filter:questionRight5">
+                        <tr ng-repeat="question in taskQuestions.questions | filter:questionRightSide">
                             <td>
                                 <h4>{{ question.content }}</h4>
                             </td>
                             <td>
-                                <div class="col-md-1" />
+                                <div style="width:10px" />
+                            </td>
+                            <td>
+                                <div style="width:25px"><h4> = </h4></div>
                             </td>
                             <td>
                                 <input type="text" id="answer_{{ question.question_id }}"
@@ -164,9 +170,9 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-primary" id="btnStartTask"
-                      ng-click="startChallenge()" ng-disabled="isHistoryView || !notStarted">开始</button>
+                      ng-click="startTask()" ng-disabled="isHistoryView || !notStarted">开始</button>
               <button type="button" class="btn btn-primary" id="btnComplete"
-                      ng-click="completeChallenge()" ng-disabled="isHistoryView || notStarted">完成</button>
+                      ng-click="completeTask()" ng-disabled="isHistoryView || notStarted">完成</button>
             </div>
         </div>
     </div>
@@ -231,6 +237,17 @@
 </div>
 <div id="messageDialog" class="modal fade">
     <div class="modal-dialog">
-        <div class="modal-content"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">{{ messageTitle }}</h4>
+            </div>
+            <div class="modal-body homeworkHistoryDialogBodySection">
+                <h4> {{ messageText }} </h4>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
     </div>
 </div>
