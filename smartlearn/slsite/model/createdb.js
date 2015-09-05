@@ -56,8 +56,7 @@ db.task.insert({'type':'challenge', 'user_name':'zxn', 'sbj_name':'数学', 'lev
     'time_limit':'', 'question_num':'2', 'score':''});
 
 // Table: task_question
-db.task_question.insert({'task_id':'100000', 'question_id':'',
-    'user_answer':'', 'correct':''});
+db.createCollection('task_question');
 
 // Table: level
 print('Start to create the subject_level data.');
@@ -71,9 +70,15 @@ db.subject_level.insert({'sbj_name':'数学', 'level':'4',
     'desc':'100 以内加减法', 'level_points':'addition-4,subtract-4,carry-2,borrow-2'});
 db.subject_level.insert({'sbj_name':'数学', 'level':'5',
     'desc':'多数位加减法', 'level_points':'addition-5,subtract-5,carry-1,borrow-1,carry-2,borrow-2'});
-db.subject_level.insert({'sbj_name':'数学', 'level':'5',
+db.subject_level.insert({'sbj_name':'数学', 'level':'6',
     'desc':'连续加减法', 'level_points':'addition-5,subtract-5,carry-1,borrow-1,carry-2,borrow-2'});
-db.subject_level.insert({'sbj_name':'数学', 'level':'5',
+db.subject_level.insert({'sbj_name':'数学', 'level':'7',
     'desc':'连续混合加减法', 'level_points':'addition-5,subtract-5,carry-1,borrow-1,carry-2,borrow-2'});
+
+// Table: weak_point
+db.createCollection('weak_point');
+
+// Table: error_track
+db.createCollection('error_track');
 
 print('The metadb has been created successfully.');

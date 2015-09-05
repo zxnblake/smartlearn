@@ -60,3 +60,15 @@ class Assessment(Document):
     level = StringField(max_length=4)
     next_level = StringField(max_length=4)
     weak_points = StringField(max_length=128)
+
+
+class Weak_point(Document):
+    user_name = StringField(max_length=128)
+    weak_point_id = StringField(max_length=128)
+
+
+class Error_track(Document):
+    user_name = StringField(max_length=128)
+    question_id = StringField()
+    user_answer = StringField()
+    error_repeat_count = StringField()

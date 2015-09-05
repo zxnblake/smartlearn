@@ -24,6 +24,13 @@
                     <a type="button" class="btn btn-primary" data-toggle="modal"
                         data-target="#selectLevelDialog">挑战级别</a>
                 </td>
+                <td>
+                    <div class="col-md-1" />
+                </td>
+                <td>
+                    <a type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#assessmentDialog">我的评估</a>
+                </td>
             </tr>
         </table>
     </div>
@@ -228,6 +235,55 @@
                     </tr>
                   </table>
               </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="assessmentDialog" class="modal fade">
+    <div class="modal-dialog"  style="width: 550px">
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">我的评估</h4>
+            </div>
+            <div class="modal-body assessmentDialogBodySection" style="height:200px;">
+                <table class="col-md-10">
+                    <tr style="background-color: lightgray">
+                        <td>
+                            <h5>用户名称</h5>
+                        </td>
+                        <td>
+                            <h5>{{ currUser }}</h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h5>科目名称</h5>
+                        </td>
+                        <td>
+                            <h5>{{ subject }}</h5>
+                        </td>
+                    </tr>
+                    <tr style="background-color: lightgray">
+                        <td>
+                            <h5>当前级别</h5>
+                        </td>
+                        <td>
+                            <h5>{{ userSubjLevel }}</h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h5>薄弱环节</h5>
+                        </td>
+                        <td>
+                            <h5>{{ userSubjWeakPoints }}</h5>
+                        </td>
+                    </tr>
+                </table>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
