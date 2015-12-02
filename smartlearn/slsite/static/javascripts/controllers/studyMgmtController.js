@@ -5,17 +5,24 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 	{
         var TASK_TYPE_CHALLENGE = 'challenge';
         var TASK_TYPE_HOMEWORK = 'homework';
+        var TASK_TYPE_ASSESS_TEST = 'assesstest';
 
 		$scope.currUser = '';
 		$scope.homeworkList = [];
         $scope.subject = "数学";
         $scope.subjectLevels = [];
+        $scope.subjectGradeAndPoints = {};
+        $scope.gradeList = [];
+        $scope.currGrade = [];
+        $scope.currPointList = [];
+        $scope.selectedPoints = [];
         $scope.currLevel = {};
         $scope.challengeLevel = '1';
         $scope.taskQuestions = [];
         $scope.userAssessment = {};
         $scope.userSubjLevel = '';
         $scope.userSubjWeakPoints = '';
+        $scope.currQuestNum = 0;
 
         $scope.notStarted = true;
         $scope.startedTime = "";
@@ -28,6 +35,16 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
         $scope.dataReady = false;
     	$scope.isHistoryView = false;
     	$scope.challengeResultMsg = '';
+        $scope.testDialog = null;
+        $scope.dialogList = ['selectGradeDialog', 'selectLevelDialog',
+            'taskDialog', 'homeworkHistoryDialog', 'messageBox'];
+        $scope.dialogInited =
+        {
+            'selectGradeDialog': false,
+            'selectLevelDialog': false,
+            'taskDialog': false,
+            'homeworkHistoryDialog': false
+        };
 
         $scope.messageTitle = '消息';
         $scope.messageText = '错误出现，请检查！';
@@ -41,6 +58,13 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 		};
 
         var timerVar = null;
+
+        $scope.showMessageBox = function(title, msg)
+        {
+            $scope.messageTitle = title;
+            $scope.messageText = msg;
+            window.parent.$('#messageBox').modal('show');
+        };
 
         $scope.testTimer = function()
         {
@@ -66,6 +90,38 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 	  	{
     		$scope.currLevel = level;
             $scope.challengeLevel = level.level;
+	  	};
+
+        $scope.selectGrade = function(grade)
+	  	{
+    		$scope.currGrade = grade;
+            $scope.currPointList = $scope.subjectGradeAndPoints[grade];
+            $scope.selectedPoints.length = 0;
+            for (var i in $scope.currPointList)
+            {
+                var point = $scope.currPointList[i];
+                $scope.selectedPoints.push(point.point_name);
+            }
+	  	};
+
+        $scope.clickPoint = function(pointName)
+	  	{
+            var pointId = 'point_' + pointName;
+            var points = $scope.selectedPoints;
+            var currPointElement = document.getElementById(pointId);
+            if ( currPointElement.checked == false )
+            {
+                var idx = points.indexOf(pointName);
+                points.splice(idx, 1);
+            }
+            else if ( points.indexOf(pointName) == -1 )
+            {
+                points.push(pointName)
+            }
+            if ( points.length == 0 )
+            {
+                $scope.showMessageBox('错误', '必须至少选一个知识点！');
+            }
 	  	};
 
         $scope.getBgColor = function(homework)
@@ -119,9 +175,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                 var userAnswer = answerElement.value;
                 if ( userAnswer == "" )
                 {
-                    $scope.messageTitle = '提示';
-                    $scope.messageText = '题目未完成，请全部完成后再提交。不会的题目可以写 ？。';
-                    window.parent.$('#messageDialog').modal('show');
+                    $scope.showMessageBox('提示', '题目未完成，请全部完成后再提交。不会的题目可以写 ？。');
                     return;
                 }
             }
@@ -170,7 +224,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                         {
                             $scope.messageText = '挑战失败';
                         }
-                        window.parent.$('#messageDialog').modal('show');
+                        window.parent.$('#messageBox').modal('show');
                     }
 				},
 				function(err)
@@ -180,32 +234,9 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 			);
 	  	};
 
-
-        $scope.waitData = function()
-        {
-            if ( !$scope.dataReady && $scope.count < 5 )
-            {
-                $scope.count++;
-                window.setTimeout($scope.waitData, 1000);
-            }
-        }
-
 		$scope.dialogOnShown = function(evt)
 		{
-//            $scope.count = 0;
-//            $scope.waitData();
             var dialog = '#' + evt.target.id;
-//			if( $scope.dialogCompiled[dialog] == null )
-//			{
-//        		$scope.dialogCompiled[dialog] = true;
-//
-//        		var angularDomEl = angular.element( dialog );
-//
-//    			$compile(angularDomEl)( $scope );
-//			}
-//        	$scope.$apply();
-//            $scope.dataReady = false;
-
             if ( dialog == '#selectLevelDialog' )
             {
                 var levelId = $scope.currLevel.sbj_name + "_" + $scope.currLevel.level;
@@ -232,16 +263,26 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                         }
                         else
                         {
-                            if ( i < 3 )
-                            {
-			                    console.log("set correct image: ");
-                            }
                             question.correct = 'true';
                             check_result_image.src = "images/correct.png";
                             answerElement.disabled = true;
                         }
                     }
                 }
+            }
+            else ( dialog == '#selectGradeDialog' )
+            {
+                if ($scope.gradeList.length == 0)
+                {
+                    console.log("the gradeList is empty!");
+                    return;
+                }
+    		    var grade = $scope.currGrade;
+                var gradeId = 'grade_' + grade;
+                var currGradeElement = document.getElementById(gradeId);
+                console.log('grade element is: ' + currGradeElement);
+                currGradeElement.checked = true;
+                $scope.selectGrade(grade);
             }
 
 			console.log("dialog display: " + dialog);
@@ -275,6 +316,53 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 				function(err)
 				{
 					console.log("Error occurred when getting levels: " + err);
+				}
+			);
+		};
+
+        $scope.initDialog = function(dialog)
+		{
+            if ( !$scope.dialogInited[dialog] )
+            {
+                // init the dialog
+                var dialogElement = angular.element('#'+dialog);
+                dialogElement.on('shown.bs.modal',  $scope.dialogOnShown);
+                $compile(dialogElement)( $scope );
+                $scope.$apply();
+                $scope.dialogInited[dialog] = true;
+            }
+        }
+
+        $scope.getSubjectGradeAndPoints = function()
+		{
+			smartLearnService.getSubjGradePoints({subject: $scope.subject},
+				function(resp)
+				{
+                    if (resp.code == 0)
+                    {
+                        $scope.subjectGradeAndPoints = resp.result;
+                        var grades = [];
+                        for ( var k in $scope.subjectGradeAndPoints )
+                        {
+                            grades.push(k);
+                        }
+                        $scope.gradeList = grades;
+                        console.log('get grade points: ');
+                        console.log($scope.gradeList);
+                        $scope.currGrade = grades[0];
+                        $scope.currPointList = $scope.subjectGradeAndPoints[$scope.currGrade];
+                        console.log($scope.subjectGradeAndPoints);
+
+                        //$scope.initDialog('selectGradeDialog');
+                   }
+                    else
+                    {
+                        console.log("Error occurred when getting grade and points: " + resp.result);
+                    }
+				},
+				function(err)
+				{
+					console.log("Error occurred when getting grade and points: " + err);
 				}
 			);
 		};
@@ -410,21 +498,79 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 			);
 	  	};
 
-    	$scope.testDialog = function()
-	  	{
-    		$('#testDialog').modal({'data-remote':'true'});
-	  	};
+        $scope.createAssessTest = function()
+        {
+            $scope.taskDialogTitle = '小测试 : ' + $scope.currGrade + " 年级";
+            window.parent.$('#selectGradeDialog').modal('hide');
+            var param = {subject:$scope.subject, grade: $scope.currGrade,
+                selectedPoints: $scope.selectedPoints,
+                userName: $scope.currUser, taskType: TASK_TYPE_ASSESS_TEST};
+			smartLearnService.createTest(param,
+				function(resp)
+				{
+                    if (resp.code == 0)
+                    {
+                        $scope.taskQuestions = resp.result;
+                        $scope.currQuestText = $scope.getCurrQuestText();
+                        window.parent.$('#selectGradeDialog').modal('hide');
+                        window.parent.$('#testDialog').modal('show');
+                    }
+                    else
+                    {
+                        console.log("Error occurred when submitting grade selection: " + resp.result);
+                    }
+				},
+				function(err)
+				{
+					console.log("Error occurred when submitting grade selection: " + err);
+				}
+			);
+        }
 
     	$scope.setDialogOnShownFunc = function()
 	  	{
-            var dialogList = ['#selectLevelDialog', '#taskDialog', '#homeworkHistoryDialog'];
-            for ( var i in dialogList )
+            for ( var i in $scope.dialogList )
             {
-                var dialog = dialogList[i];
-                var dialogElement = angular.element(dialog);
+                var dialog = $scope.dialogList[i];
+                var dialogElement = angular.element('#'+dialog);
                 dialogElement.on('shown.bs.modal',  $scope.dialogOnShown);
             }
 	  	};
+
+    	$scope.getAndInitDialogs = function()
+	  	{
+            for ( var i in $scope.dialogList )
+            {
+                var dialog = $scope.dialogList[i];
+                console.log('init dialog: ' + dialog);
+                $scope.compileDialog(dialog);
+            }
+	  	};
+
+        $scope.testDialog = function()
+	  	{
+            $scope.messageText = 'test dialog now!';
+            var messageBox = angular.element('#messageBox');
+            $scope.$apply();
+            messageBox.modal('show');
+	  	};
+
+    	$scope.compileDialog = function(dialog)
+        {
+            var htmlpage = 'htmls/' + dialog + '.html';
+            $.get(htmlpage, function(result)
+            {
+                console.log('get dialog html page: ' + htmlpage);
+                $('body').append(result);
+                if ( dialog = 'messageBox' )
+                {
+                    var dialogElement = angular.element('#'+dialog);
+                    dialogElement.on('shown.bs.modal',  $scope.dialogOnShown);
+                    $compile(dialogElement)( $scope );
+                    $scope.$apply();
+                }
+            });
+        }
 
         $scope.checkUserLogin = function()
         {
@@ -446,7 +592,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                         console.log("User already logged in.");
 
                         $scope.getUserAssessment();
-                        $scope.getSubjectLevels();
+                        $scope.getSubjectGradeAndPoints();
                     }
                     else
                     {
@@ -462,6 +608,73 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 					console.log("Error occurred when user login: " + err);
 				}
 			);
+        };
+
+        $scope.displayQuestion = function(question)
+        {
+            var questions = $scope.taskQuestions.questions;
+            var idx = questions.indexOf(question);
+            if ( idx == $scope.currQuestNum )
+            {
+                return true;
+            }
+            return false;
+        }
+
+        $scope.displaySimpleQuestAnswer = function(question)
+        {
+            if ( question.type == "simple" )
+            {
+                return true;
+            }
+            return false;
+        }
+
+        $scope.displayComplexQuestAnswer = function(question)
+        {
+            if ( question.type == "complex" )
+            {
+                return true;
+            }
+            return false;
+        }
+
+        $scope.displayComplexQuestPic = function(question)
+        {
+            if ( question.type == "complex_with_pic" )
+            {
+                return true;
+            }
+            return false;
+        }
+
+        $scope.getCurrQuestText = function()
+        {
+            return $scope.currQuestNum + 1 + " / " + $scope.taskQuestions.questions.length;
+        }
+
+        $scope.waitData = function()
+        {
+            $scope.dataReady = false;
+            if ($scope.gradeList.length > 0)
+            {
+                var grade = $scope.gradeList[0];
+                console.log('grade is: ' + grade);
+                var gradeId = 'grade_' + grade;
+                var currGradeElement = document.getElementById(gradeId);
+                if ( currGradeElement )
+                {
+                    $scope.dataReady = true;
+                }
+            }
+            if ( !$scope.dataReady && $scope.count < 30 )
+            {
+                $scope.count++;
+                console.log("Waiting for data ready, time count: " + $scope.count);
+                window.setTimeout($scope.waitData, 1000);
+                return;
+            }
+            document.body.style.cursor = "";
         };
 
         $scope.checkUserLogin();

@@ -33,6 +33,12 @@ function ClearDB()
         // Table: level
         db.subject_level.remove({});
 
+        // Table: grade_point
+        db.grade_point.remove({});
+
+        // Table: point_level
+        db.point_level.remove({});
+
         print('The metadb has been cleared.');
     }
 }

@@ -192,3 +192,54 @@ def get_task_questions(request):
     respstr = simplejson.dumps(resp)
     print(respstr)
     return HttpResponse(respstr)
+
+
+def get_grade_points(request):
+    resp = {'result': "success", 'code': 0, 'message': ""}
+    print('received an http request: get grade points!')
+    print('request.body == %s' %request.body)
+
+    req = simplejson.loads(request.body)
+    subject = req['subject']
+
+    try:
+        gradePoints = Grade_point.objects(sbj_name=subject)
+        gpmap = {}
+        for gp in gradePoints:
+            grade = gp.grade
+            if not grade in gpmap.keys():
+                gpmap[grade] = []
+            gps = gpmap.get(grade)
+            pls = Point_level.objects(point_name=gp.point_name)
+            if len(pls) == 0:
+                continue
+            pl = pls[0]
+            point = {}
+            point['point_name'] = gp.point_name
+            point['weight'] = gp.weight
+            point['desc'] = pl.desc
+            gps.append(point)
+        print('gpmap: ' + simplejson.dumps(gpmap))
+        resp['result'] = gpmap
+    except OperationError as e:
+        resp['result'] = "error"
+        resp['code'] = 99
+        resp['message'] = "error occurred when querying database"
+
+    respstr = simplejson.dumps(resp)
+    print(respstr)
+    return HttpResponse(respstr)
+
+
+def create_test(request):
+    resp = {'result': "success", 'code': 0, 'message': ""}
+    print('received an http request: create test!')
+    print('request.body == %s' % request.body)
+
+    args = simplejson.loads(request.body)
+    tm = TaskManager()
+    tm.create_test(args, resp)
+
+    respstr = simplejson.dumps(resp)
+    print(respstr)
+    return HttpResponse(respstr)

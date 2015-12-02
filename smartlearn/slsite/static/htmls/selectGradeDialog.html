@@ -1,0 +1,58 @@
+<div class="modal fade" id="selectGradeDialog" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">选择科目和级别</h4>
+            </div>
+            <div class="modal-body selectGradeDialogBodySection">
+              <div style="font-size:18px;">
+                科目: {{ subject }}
+              </div>
+              <div id="subjectGradeTable">
+                  <hr />
+                  <table style="table-layout:fixed;">
+                    <tr>
+                        <td style="vertical-align:top">
+                            <h4 class="control-label"> 年级列表 </h4>
+                             <div class="col-md-12 levelList pre-scrollable"
+                                  style="height:200px;width:200px;border-style:groove">
+                                <div ng-repeat="grade in gradeList" style="margin-top:10px;text-align: left">
+                                    <label class="btn btn-primary" style="width:150px">
+                                        <input type="radio" name="options"
+                                               id="grade_{{ grade }}"
+                                               ng-click="selectGrade(grade)"> {{ grade }} 年级
+                                    </label>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="col-md-1" />
+                        </td>
+
+                        <td style="vertical-align:top">
+                            <h4 class="control-label"> 选择已学内容 </h4>
+                            <div class="col-md-12 pre-scrollable"
+                                 style="height:200px;width:250px;border-style:groove">
+                                <div ng-repeat="point in currPointList" style="margin-top:10px;">
+                                    <label class="btn btn-primary" style="width:200px;text-align: left">
+                                        <input type="checkbox" name="options"
+                                               id="point_{{ point.point_name }}"
+                                               ng-click="clickPoint(point)" checked="true"> {{ point.desc }}
+                                    </label>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                  </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary" id="btnOK" ng-click="createChallenge()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>

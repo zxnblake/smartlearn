@@ -6,6 +6,13 @@
             <tr>
                 <td>
                     <a type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#selectGradeDialog">选择年级</a>
+                </td>
+                <td>
+                    <div class="col-md-1" />
+                </td>
+                <td>
+                    <a type="button" class="btn btn-primary" data-toggle="modal"
                         data-target="#homeworkHistoryDialog"
                         ng-click="showHomeworkHistoryDialog()">历史作业</a>
                 </td>
@@ -22,17 +29,68 @@
                 </td>
                 <td>
                     <a type="button" class="btn btn-primary" data-toggle="modal"
-                        data-target="#selectLevelDialog">挑战级别</a>
-                </td>
-                <td>
-                    <div class="col-md-1" />
-                </td>
-                <td>
-                    <a type="button" class="btn btn-primary" data-toggle="modal"
                         data-target="#assessmentDialog">我的评估</a>
                 </td>
             </tr>
         </table>
+    </div>
+</div>
+<div class="modal fade" id="selectGradeDialog" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">选择科目和级别</h4>
+            </div>
+            <div class="modal-body selectGradeDialogBodySection">
+              <div style="font-size:18px;">
+                科目: {{ subject }}
+              </div>
+              <div id="subjectGradeTable">
+                  <hr />
+                  <table style="table-layout:fixed;">
+                    <tr>
+                        <td style="vertical-align:top">
+                            <h4 class="control-label"> 年级列表 </h4>
+                             <div class="col-md-12 levelList pre-scrollable"
+                                  style="height:200px;width:200px;border-style:groove">
+                                <div ng-repeat="grade in gradeList" style="margin-top:10px;text-align: left">
+                                    <label class="btn btn-primary" style="width:150px">
+                                        <input type="radio" name="options"
+                                               id="grade_{{ grade }}"
+                                               ng-click="selectGrade(grade)"> {{ grade }} 年级
+                                    </label>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="col-md-1" />
+                        </td>
+
+                        <td style="vertical-align:top">
+                            <h4 class="control-label"> 选择已学内容 </h4>
+                            <div class="col-md-12 pre-scrollable"
+                                 style="height:200px;width:250px;border-style:groove">
+                                <div ng-repeat="point in currPointList" style="margin-top:10px;">
+                                    <label class="btn btn-primary" style="width:200px;text-align: left">
+                                        <input type="checkbox" name="options"
+                                               id="point_{{ point.point_name }}"
+                                               ng-click="clickPoint(point.point_name)" checked="true"> {{ point.desc }}
+                                    </label>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                  </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary" id="btnOK" ng-click="createAssessTest()">确定</button>
+            </div>
+        </div>
     </div>
 </div>
 <div class="modal fade" id="selectLevelDialog" tabindex="-1" role="dialog"
@@ -291,18 +349,127 @@
         </div>
     </div>
 </div>
-<div id="messageDialog" class="modal fade">
+<div class="modal fade" id="testDialog" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 680px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{ testDialogTitle }}</h4>
+                <table>
+                   <tr>
+                       <td>
+                            <h4 id="time_count">计时 : {{ taskQuestions.time_used }}</h4>
+                       </td>
+                       <td>
+                            <div style="width:350px" />
+                       </td>
+                       <td>
+                            <h4 style="float:right">分数 : {{ taskQuestions.score }}</h4>
+                       </td>
+                   </tr>
+                </table>
+                <table>
+                   <tr>
+                       <td>
+                           <button type="button" class="btn btn-primary" id="btnPrevQuest"
+                               ng-click="gotoPrevQuest()" ng-disabled="disablePrevBtn()">上一题</button>
+                       </td>
+                       <td>
+                           <div style="width:20px"></div>
+                       </td>
+                       <td>
+                           <button type="button" class="btn btn-primary" id="btnCurrQuest"
+                               ng-disabled="true">当前 {{ currQuestText }} </button>
+                       </td>
+                       <td>
+                           <div style="width:20px"></div>
+                       </td>
+                       <td>
+                           <button type="button" class="btn btn-primary" id="btnNextQuest"
+                               ng-click="gotoNextQuest()" ng-disabled="disableNextBtn()">下一题</button>
+                       </td>
+                       <td>
+                           <div style="width:50px"></div>
+                       </td>
+                       <td>
+                           <button type="button" class="btn btn-primary" id="btnGotoQuest"
+                               ng-click="gotoQuest()" ng-disabled="!notStarted">转到 -></button>
+                       </td>
+                       <td>
+                           <div style="width:10px"></div>
+                       </td>
+                       <td>
+                           <input type="text" id="input_goto_page" 
+                                  ng-disabled="!notStarted" style="width: 50px;font-size: 20px"/>
+                       </td>
+                   </tr>
+                </table>
+            </div>
+            <div id="questionPage" class="modal-body testDialogBodySection" style="height:320px;"
+                    ng-repeat="question in taskQuestions.questions" ng-show="displayQuestion(question)">
+                <div id="question_page_{{ question.question_id }}">
+                    <table>
+                        <tr>
+                            <td>
+                                <span style="font-size:25px">{{ question.content }}</span>
+                            </td>
+                            <td>
+                                <div style="width:20px" />
+                            </td>
+                            <td>
+                                <div ng-show="displaySimpleQuestAnswer(question)"
+                                     style="font-size:25px">
+                                    =
+                                </div>
+                            </td>
+                            <td>
+                                <div style="width:20px" />
+                            </td>
+                            <td>
+                                <div ng-show="displaySimpleQuestAnswer(question)">
+                                    <input type="text" id="answer_{{ question.question_id }}"
+                                           style="width:100px;font-size:25px"
+                                           value="{{ question.user_answer }}"/>
+                                </div>
+                                <div ng-show="displayComplexQuestPic(question)">
+                                    <img id="image_question_{{ question.question_id }}"
+                                         style="height:100px;width:100px;display:none" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div ng-show="displayComplexQuestAnswer(question)">
+                                    <h4>{{ question.answer_text }}</h4>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" id="btnStartTask"
+                      ng-click="startTask()" ng-disabled="isHistoryView || !notStarted">开始</button>
+              <button type="button" class="btn btn-primary" id="btnComplete"
+                      ng-click="completeTask()" ng-disabled="isHistoryView || notStarted">完成</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="messageBox" class="modal fade" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-              <h4 class="modal-title">{{ messageTitle }}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{ messageTitle }}</h4>
             </div>
-            <div class="modal-body homeworkHistoryDialogBodySection">
-                <h4> {{ messageText }} </h4>
-            </div>
+            <div class="modal-body">
+                <h3>{{ messageText }}</h3>
+           </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

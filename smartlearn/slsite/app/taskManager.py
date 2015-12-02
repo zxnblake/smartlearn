@@ -20,7 +20,7 @@ class TaskManager:
 
         questNum = 10
         if taskType == 'challenge':
-            questNum = 6
+            questNum = 10
 
         try:
             # 1. we will include error questions in weekend homework
@@ -198,3 +198,82 @@ class TaskManager:
     def __get_questions_by_level(self, subject, level):
         questions = Question.objects(sbj_name=subject, level=level)
         return questions
+
+    def __get_questions_by_point(self, subject, questPoints):
+        questions = Question.objects(sbj_name=subject)
+        selQuests = []
+        for q in questions:
+            qps = q.sbj_points.split(',')
+            pok = True
+            for p in qps:
+                if not p in questPoints:
+                    pok = False
+                    break
+            if pok:
+                selQuests.append(q)
+        return selQuests
+
+    def create_test(self, args, resp):
+        subject = args['subject']
+        grade = args['grade']
+        points = args['selectedPoints']
+        userName = args['userName']
+        taskType = args['taskType']
+
+        rate = 0.05
+        try:
+            # 1. select questions for each point
+            selectedQuestions = []
+            pointNum = {}
+            questNum = 0
+            gradePoints = Grade_point.objects(sbj_name=subject, grade=grade)
+            for gp in gradePoints:
+                if gp.point_name in points:
+                    num = int(int(gp.weight) * rate)
+                    print('num = ', num)
+                    pointNum[gp.point_name] = num
+                    if num > 0:
+                        ptls = Point_level.objects(point_name=gp.point_name)
+                        questPoints = ptls[0].level_points.split(',')
+                        quests = self.__get_questions_by_point(subject, questPoints)
+                        print('questPoints = ', questPoints)
+                        print('quests = ', quests)
+                        selQuests = self.__select_rand_questions(quests, num)
+                        selectedQuestions.extend(selQuests)
+                        questNum = questNum + num
+
+            print('selectedQuestions =')
+            print(selectedQuestions)
+
+            # 2. create a new task record
+            today = datetime.date.today()
+            ctime = int(time.time())
+            taskNew = Task(type=taskType, user_name=userName, sbj_name=subject,
+                        date=str(today), create_time=str(ctime), time_used='',
+                        time_limit='', question_num=str(questNum), score='')
+            taskNew.save()
+            tasks = Task.objects(user_name=userName, sbj_name=subject,
+                                create_time=str(ctime))
+            print('tasks =')
+            print(tasks)
+
+            if len(tasks) == 1:
+                task = tasks[0]
+                print('new task is added with id=%s' %task.id)
+                for quest in selectedQuestions:
+                    taskQuest = Task_question(task_id=str(task.id),
+                                              question_id=str(quest.id),
+                                              user_answer='',
+                                              correct='')
+                    taskQuest.save()
+                taskResp = self.__make_task_resp(task, selectedQuestions)
+                print(taskResp)
+                resp['result'] = taskResp
+            else:
+                resp['code'] = 130
+                resp['result'] = "failed to add new task"
+                print(resp['result'])
+        except OperationError as e:
+            resp['result'] = "error"
+            resp['code'] = 99
+            resp['message'] = "error occurred when accessing database"

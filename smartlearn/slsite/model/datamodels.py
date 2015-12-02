@@ -31,6 +31,9 @@ class Question(Document):
     sbj_points = StringField()
     level = StringField()
     answer = StringField()
+    type = StringField(max_length=32)
+    answer_label = StringField()
+    content_pic = StringField()
 
 
 class Task(Document):
@@ -72,3 +75,17 @@ class Error_track(Document):
     question_id = StringField()
     user_answer = StringField()
     error_repeat_count = StringField()
+
+
+class Grade_point(Document):
+    grade = StringField(max_length=36)
+    sbj_name = StringField(max_length=128)
+    point_name = StringField()
+    weight = StringField()
+
+
+class Point_level(Document):
+    point_name = StringField()
+    sbj_name = StringField(max_length=128)
+    desc = StringField()
+    level_points = StringField()

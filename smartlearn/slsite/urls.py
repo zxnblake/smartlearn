@@ -16,5 +16,7 @@ urlpatterns = patterns('',
     url(r'^study/userAssessment/$', get_user_assessment),
     url(r'^study/taskHistory/$', get_task_history),
     url(r'^study/taskQuestions/$', get_task_questions),
+    url(r'^study/subjectGradeAndPoints/$', get_grade_points),
+    url(r'^study/createTest/$', create_test),
 )
 urlpatterns += staticfiles_urlpatterns()

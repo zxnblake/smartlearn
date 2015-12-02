@@ -1,5 +1,5 @@
 /**
- * Created by admin on 8/8/15.
+ * Created by Zhang Xiao Ning on 8/8/15.
  */
 
 function QuestionHelper()
@@ -97,7 +97,8 @@ add_level_1 = function(i, j)
     var cont = i + " + " + j;
     var quest = null;
     var q = {'sbj_name':'数学', 'content':cont,'sbj_points':'addition-1',
-                'level':'1', 'answer':sum.toString()};
+                'level':'1', 'answer':sum.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     if ( i in [0,1] || j in [0,1] )
     {
         var rd = Math.floor(Math.random() * 101);
@@ -120,7 +121,8 @@ add_level_2 = function(i, j)
     var cont = i + " + " + j;
     var quest = null;
     var q = {'sbj_name':'数学', 'content':cont,'sbj_points':'addition-2',
-                'level':'2', 'answer':sum.toString()};
+                'level':'2', 'answer':sum.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     if ( sum <= 10 )
     {
         var cont = i + " + " + j;
@@ -157,9 +159,11 @@ add_level_3 = function(i, j)
     var cont = i + " + " + j;
     var quest = null;
     var q = {'sbj_name':'数学', 'content':cont,'sbj_points':'addition-3',
-                'level':'3', 'answer':sum.toString()};
+                'level':'3', 'answer':sum.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     var q2 = {'sbj_name':'数学', 'content':cont,'sbj_points':'addition-3,carry-1',
-                'level':'3', 'answer':sum.toString()};
+                'level':'3', 'answer':sum.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     if ( sum <= 20 )
     {
         var rd = Math.floor(Math.random() * 101);
@@ -200,9 +204,11 @@ add_level_4 = function(i, j)
     var cont = i + " + " + j;
     var quest = null;
     var q = {'sbj_name':'数学', 'content':cont,'sbj_points':'addition-4',
-                'level':'4', 'answer':sum.toString()};
+                'level':'4', 'answer':sum.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     var q2 = {'sbj_name':'数学', 'content':cont,'sbj_points':'addition-4,carry-1',
-                'level':'4', 'answer':sum.toString()};
+                'level':'4', 'answer':sum.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     if ( sum <= 50 )
     {
         var rd = Math.floor(Math.random() * 101);
@@ -247,7 +253,8 @@ subtract_level_1 = function(i, j)
     var cont = i + " - " + j;
     var quest = null;
     var q = {'sbj_name':'数学', 'content':cont, 'sbj_points':'subtract-1',
-        'level':'1', 'answer':subtr.toString()};
+                'level':'1', 'answer':subtr.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     if ( j in [0,1] )
     {
         var rd = Math.floor(Math.random() * 101);
@@ -274,7 +281,8 @@ subtract_level_2 = function(i, j)
     var cont = i + " - " + j;
     var quest = null;
     var q = {'sbj_name':'数学', 'content':cont, 'sbj_points':'subtract-2',
-        'level':'2', 'answer':subtr.toString()};
+                'level':'2', 'answer':subtr.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     if ( (i < 10 && j < 10) || (i > 10 && j > 10) || j in [0, 1, 2])
     {
         var rd = Math.floor(Math.random() * 101);
@@ -301,9 +309,11 @@ subtract_level_3 = function(i, j)
     var cont = i + " - " + j;
     var quest = null;
     var q = {'sbj_name':'数学', 'content':cont, 'sbj_points':'subtract-3',
-        'level':'3', 'answer':subtr.toString()};
+                'level':'3', 'answer':subtr.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     var q2 = {'sbj_name':'数学', 'content':cont, 'sbj_points':'subtract-3,borrow-1',
-        'level':'3', 'answer':subtr.toString()};
+                'level':'3', 'answer':subtr.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     if ( i <= 20 && j <= 20 )
     {
         var rd = Math.floor(Math.random() * 101);
@@ -344,9 +354,11 @@ subtract_level_4 = function(i, j)
     var cont = i + " - " + j;
     var quest = null;
     var q = {'sbj_name':'数学', 'content':cont, 'sbj_points':'subtract-4',
-        'level':'4', 'answer':subtr.toString()};
+        'level':'4', 'answer':subtr.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     var q2 = {'sbj_name':'数学', 'content':cont, 'sbj_points':'subtract-4,borrow-1',
-        'level':'4', 'answer':subtr.toString()};
+        'level':'4', 'answer':subtr.toString(), 'type':'simple',
+                'answer_label':'', 'content_pic':''};
     if ( i <= 50 && j <= 50 )
     {
         var rd = Math.floor(Math.random() * 101);
@@ -441,7 +453,8 @@ genAddQuestsLevel5 = function(num)
         var cont = a1 + " + " + a2;
         var sbjpts = getAddSbjPoints(a1, a2);
         var q = {'sbj_name':'数学', 'content':cont, 'sbj_points':'subtract-4',
-            'level':'5', 'answer':sumstr.toString()};
+                    'level':'5', 'answer':sumstr.toString(), 'type':'simple',
+                    'answer_label':'', 'content_pic':''};
         if ( sbjpts == 'addition-5' && i < num )
         {
             quests.unshift(q);
@@ -510,7 +523,8 @@ genSubtQuestsLevel5 = function(num)
         var cont = s1 + " - " + s2;
         var sbjpts = getSubtrSbjPoints(s1, s2);
         var q = {'sbj_name':'数学', 'content':cont, 'sbj_points':sbjpts,
-            'level':'5', 'answer':subtstr};
+                    'level':'5', 'answer':subtstr, 'type':'simple',
+                    'answer_label':'', 'content_pic':''};
         if ( sbjpts == 'subtract-5' && i < num )
         {
             quests.push(q);
