@@ -22,12 +22,16 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
         $scope.userAssessment = {};
         $scope.userSubjLevel = '';
         $scope.userSubjWeakPoints = '';
-        $scope.currQuestNum = 0;
+        $scope.currQuestNum = 1;
+        $scope.gotoQuestNum = 0;
+        $scope.displayResult = false;
+        $scope.resultLines = [];
 
         $scope.notStarted = true;
         $scope.startedTime = "";
         $scope.timeUsed = "";
         $scope.timeUsedStr = "0 分 0 秒";
+        $scope.testCompleted = false;
 
         $scope.homeworkHistoryDialog = angular.element('#homeworkHistoryDialog');
         $scope.taskDialog = angular.element('#taskDialog');
@@ -96,6 +100,10 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 	  	{
     		$scope.currGrade = grade;
             $scope.currPointList = $scope.subjectGradeAndPoints[grade];
+            if ( $scope.selectedPoints.length > 0 )
+            {
+                return;
+            }
             $scope.selectedPoints.length = 0;
             for (var i in $scope.currPointList)
             {
@@ -180,14 +188,21 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                 }
             }
             var correctCount = 0;
-            for ( var i in questions )
+            var questCount = questions.length;
+            for ( var i=0; i<questCount; i++ )
             {
                 var question = questions[i];
                 var qid = question.question_id;
                 var answerElement = document.getElementById('answer_'+qid);
                 var userAnswer = answerElement.value;
                 question.user_answer = userAnswer;
-                var check_result_image = document.getElementById('image_result_'+qid);
+                var line = Math.floor(i / 5);
+                var col = i % 5;
+                var label_question =
+                    document.getElementById('label_question_'+ line + '_' + col);
+                label_question.innerHTML = "" + (i + 1);
+                var check_result_image =
+                    document.getElementById('image_result_'+ line + '_' + col);
 				check_result_image.style.visibility = "visible";
                 if ( userAnswer != question.answer )
                 {
@@ -202,6 +217,8 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                     answerElement.disabled = true;
                 }
             }
+            $scope.showTestResult();
+            $scope.testCompleted = true;
 
             $scope.taskQuestions.start_time = $scope.startedTime;
             $scope.taskQuestions.time_used = $scope.timeUsedStr;
@@ -500,6 +517,10 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 
         $scope.createAssessTest = function()
         {
+            $scope.isHistoryView = false;
+            $scope.timeUsedStr = "0 分 0 秒";
+    		$scope.notStarted = true;
+            $scope.testCompleted = false;
             $scope.taskDialogTitle = '小测试 : ' + $scope.currGrade + " 年级";
             window.parent.$('#selectGradeDialog').modal('hide');
             var param = {subject:$scope.subject, grade: $scope.currGrade,
@@ -512,6 +533,12 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                     {
                         $scope.taskQuestions = resp.result;
                         $scope.currQuestText = $scope.getCurrQuestText();
+                        var questions = $scope.taskQuestions.questions;
+                        var linecount = Math.floor((questions.length-1) / 5) + 1;
+                        for ( var i=0; i<linecount; i++ )
+                        {
+                            $scope.resultLines[i] = i;
+                        }
                         window.parent.$('#selectGradeDialog').modal('hide');
                         window.parent.$('#testDialog').modal('show');
                     }
@@ -614,7 +641,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
         {
             var questions = $scope.taskQuestions.questions;
             var idx = questions.indexOf(question);
-            if ( idx == $scope.currQuestNum )
+            if ( !$scope.displayResult && idx == $scope.currQuestNum - 1)
             {
                 return true;
             }
@@ -632,7 +659,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 
         $scope.displayComplexQuestAnswer = function(question)
         {
-            if ( question.type == "complex" )
+            if ( question && question.type == "complex" )
             {
                 return true;
             }
@@ -641,7 +668,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 
         $scope.displayComplexQuestPic = function(question)
         {
-            if ( question.type == "complex_with_pic" )
+            if ( question && question.type == "complex_with_pic" )
             {
                 return true;
             }
@@ -650,7 +677,89 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 
         $scope.getCurrQuestText = function()
         {
-            return $scope.currQuestNum + 1 + " / " + $scope.taskQuestions.questions.length;
+            var questions = $scope.taskQuestions.questions;
+            if ( questions )
+            {
+                return $scope.currQuestNum + " / " + questions.length;
+            }
+            return "0 / 0";
+        }
+
+        $scope.gotoPrevQuest = function()
+        {
+            if ( $scope.currQuestNum > 1 )
+            {
+                $scope.currQuestNum--;
+                $scope.currQuestText = $scope.getCurrQuestText();
+            }
+        }
+
+        $scope.gotoNextQuest = function()
+        {
+            var questions = $scope.taskQuestions.questions;
+            if ( questions && $scope.currQuestNum < questions.length )
+            {
+                $scope.currQuestNum++;
+                $scope.currQuestText = $scope.getCurrQuestText();
+            }
+        }
+
+        $scope.disablePrevBtn = function()
+        {
+            return $scope.currQuestNum <= 1;
+        }
+
+        $scope.disableNextBtn = function()
+        {
+            var questions = $scope.taskQuestions.questions;
+            if ( questions )
+            {
+                return $scope.currQuestNum >= questions.length;
+            }
+            return true;
+        }
+
+        $scope.gotoQuest = function(line, col)
+        {
+            if ( line != undefined )
+            {
+                $scope.gotoQuestNum = line * 5 + col + 1;
+            }
+            if ( $scope.gotoQuestNum == '' ||
+                $scope.currQuestNum == $scope.gotoQuestNum )
+            {
+                return;
+            }
+            var questions = $scope.taskQuestions.questions;
+            if ( questions && $scope.gotoQuestNum > 0 &&
+                $scope.gotoQuestNum <= questions.length )
+            {
+                $scope.currQuestNum = $scope.gotoQuestNum;
+                $scope.currQuestText = $scope.getCurrQuestText();
+            }
+            $scope.displayResult = false;
+        }
+
+        $scope.displayQuestResult = function(line, col)
+        {
+            var questions = $scope.taskQuestions.questions;
+            if ( !questions )
+            {
+                return false;
+            }
+            var x = line * 5 + col;
+            if ( x >= questions.length )
+            {
+                return false;
+            }
+            return true;
+        }
+
+        $scope.showTestResult = function()
+        {
+            $scope.displayResult = true;
+            $scope.currQuestNum = 0;
+            $scope.currQuestText = $scope.getCurrQuestText();
         }
 
         $scope.waitData = function()

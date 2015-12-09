@@ -116,7 +116,8 @@
                                     <label class="btn btn-primary" style="width: 200px">
                                         <input type="radio" name="options"
                                                id="{{ level.sbj_name }}_{{level.level}}"
-                                               ng-click="selectLevel(level)" ng-disabled="disableLevel(level)"> 级别 {{level.level}}
+                                               ng-click="selectLevel(level)"
+                                               ng-disabled="disableLevel(level)"> 级别 {{level.level}}
                                     </label>
                                 </div>
                             </div>
@@ -369,6 +370,7 @@
                        </td>
                    </tr>
                 </table>
+                <hr>
                 <table>
                    <tr>
                        <td>
@@ -394,64 +396,105 @@
                        </td>
                        <td>
                            <button type="button" class="btn btn-primary" id="btnGotoQuest"
-                               ng-click="gotoQuest()" ng-disabled="!notStarted">转到 -></button>
+                               ng-click="gotoQuest()" ng-disabled="notStarted">转到 -></button>
                        </td>
                        <td>
                            <div style="width:10px"></div>
                        </td>
                        <td>
-                           <input type="text" id="input_goto_page" 
-                                  ng-disabled="!notStarted" style="width: 50px;font-size: 20px"/>
+                           <input type="text" id="input_goto_page" ng-model="gotoQuestNum"
+                                  ng-disabled="notStarted" style="width: 50px;font-size: 20px"/>
+                       </td>
+                       <td>
+                           <div style="width:100px"></div>
+                       </td>
+                       <td>
+                           <button type="button" class="btn btn-primary" id="btnShowTestResult"
+                               ng-click="showTestResult()" ng-disabled="!testCompleted">测试结果</button>
                        </td>
                    </tr>
                 </table>
             </div>
-            <div id="questionPage" class="modal-body testDialogBodySection" style="height:320px;"
+            <div id="question_{{ question.question_id }}" class="modal-body testDialogBodySection" style="height:300px;"
                     ng-repeat="question in taskQuestions.questions" ng-show="displayQuestion(question)">
-                <div id="question_page_{{ question.question_id }}">
-                    <table>
-                        <tr>
-                            <td>
-                                <span style="font-size:25px">{{ question.content }}</span>
-                            </td>
-                            <td>
-                                <div style="width:20px" />
-                            </td>
-                            <td>
-                                <div ng-show="displaySimpleQuestAnswer(question)"
-                                     style="font-size:25px">
-                                    =
-                                </div>
-                            </td>
-                            <td>
-                                <div style="width:20px" />
-                            </td>
-                            <td>
-                                <div ng-show="displaySimpleQuestAnswer(question)">
-                                    <input type="text" id="answer_{{ question.question_id }}"
-                                           style="width:100px;font-size:25px"
-                                           value="{{ question.user_answer }}"/>
-                                </div>
-                                <div ng-show="displayComplexQuestPic(question)">
-                                    <img id="image_question_{{ question.question_id }}"
-                                         style="height:100px;width:100px;display:none" />
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div ng-show="displayComplexQuestAnswer(question)">
-                                    <h4>{{ question.answer_text }}</h4>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                <table>
+                    <tr>
+                        <td>
+                            <span style="font-size:25px">{{ question.content }}</span>
+                        </td>
+                        <td>
+                            <div style="width:20px" />
+                        </td>
+                        <td>
+                            <div ng-show="displaySimpleQuestAnswer(question)"
+                                 style="font-size:25px">
+                                =
+                            </div>
+                        </td>
+                        <td>
+                            <div style="width:20px" />
+                        </td>
+                        <td>
+                            <div ng-show="displaySimpleQuestAnswer(question)">
+                                <input type="text" id="answer_{{ question.question_id }}"
+                                       style="width:100px;font-size:25px"
+                                       ng-model="question.user_answer"
+                                       ng-disabled="notStarted" />
+                            </div>
+                            <div ng-show="displayComplexQuestPic(question)">
+                                <img id="image_question_{{ question.question_id }}"
+                                     style="height:100px;width:100px;display:none" />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div ng-show="displayComplexQuestAnswer(question)">
+                                <h4>{{ question.answer_text }}</h4>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="test_result_page" class="modal-body testDialogBodySection" style="height:300px;"
+                    ng-show="displayResult">
+                <table>
+                    <tr ng-repeat="resLine in resultLines">
+                        <td ng-repeat="resColumn in [0,1,2,3,4]" ng-show="displayQuestResult(resLine, resColumn)">
+                            <table>
+                                <tr>
+                                   <td>
+                                        <label id="label_question_{{ resLine }}_{{ resColumn }}"></label>
+                                    </td>
+                                    <td>
+                                        <div style="width:10px" />
+                                    </td>
+                                    <td>
+                                        <img id="image_result_{{ resLine }}_{{ resColumn }}"
+                                             style="height:20px;width:20px;"
+                                             ng-click="gotoQuest(resLine, resColumn)" />
+                                    </td>
+                                    <td>
+                                        <div style="width:20px" />
+                                    </td>
+                                </tr>
+
+                            </table>
+                         </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div ng-show="displayComplexQuestAnswer(question)">
+                                <h4>{{ question.answer_text }}</h4>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-primary" id="btnStartTask"
+                <button type="button" class="btn btn-primary" id="btnStartTask"
                       ng-click="startTask()" ng-disabled="isHistoryView || !notStarted">开始</button>
-              <button type="button" class="btn btn-primary" id="btnComplete"
+                <button type="button" class="btn btn-primary" id="btnComplete"
                       ng-click="completeTask()" ng-disabled="isHistoryView || notStarted">完成</button>
             </div>
         </div>
