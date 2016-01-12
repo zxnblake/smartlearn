@@ -59,7 +59,7 @@
                                     <label class="btn btn-primary" style="width:150px">
                                         <input type="radio" name="options"
                                                id="grade_{{ grade }}"
-                                               ng-click="selectGrade(grade)"> {{ grade }} 年级
+                                               ng-click="selectGrade(grade)"> {{ grade }}
                                     </label>
                                 </div>
                             </div>
@@ -77,7 +77,7 @@
                                     <label class="btn btn-primary" style="width:200px;text-align: left">
                                         <input type="checkbox" name="options"
                                                id="point_{{ point.point_name }}"
-                                               ng-click="clickPoint(point.point_name)" checked="true"> {{ point.desc }}
+                                               ng-click="clickPoint(point.point_name)" checked="true"> {{ point.point_desc }}
                                     </label>
                                 </div>
                             </div>
@@ -305,44 +305,78 @@
     <div class="modal-dialog"  style="width: 550px">
         <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-              <h4 class="modal-title">我的评估</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">我的评估</h4>
             </div>
-            <div class="modal-body assessmentDialogBodySection" style="height:200px;">
-                <table class="col-md-10">
-                    <tr style="background-color: lightgray">
-                        <td>
-                            <h5>用户名称</h5>
-                        </td>
-                        <td>
-                            <h5>{{ currUser }}</h5>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <h5>科目名称</h5>
-                        </td>
-                        <td>
-                            <h5>{{ subject }}</h5>
-                        </td>
-                    </tr>
-                    <tr style="background-color: lightgray">
-                        <td>
-                            <h5>当前级别</h5>
-                        </td>
-                        <td>
-                            <h5>{{ userSubjLevel }}</h5>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <h5>薄弱环节</h5>
-                        </td>
-                        <td>
-                            <h5>{{ userSubjWeakPoints }}</h5>
-                        </td>
-                    </tr>
-                </table>
+            <div class="modal-body assessmentDialogBodySection" style="height:400px;">
+                <div>
+                    <table>
+                        <tr>
+                            <td>
+                                <h5>用户名称:</h5>
+                            </td>
+                            <td>
+                                <div style="width:10px" />
+                            </td>
+                            <td>
+                                <h5>{{ currUser }}</h5>
+                            </td>
+                            <td>
+                                <div style="width:200px" />
+                            </td>
+                            <td>
+                                <h5>科目名称:</h5>
+                            </td>
+                            <td>
+                                <div style="width:10px" />
+                            </td>
+                            <td>
+                                <h5>{{ subject }}</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h5>当前级别:</h5>
+                            </td>
+                            <td>
+                                <div style="width:10px" />
+                            </td>
+                            <td>
+                                <h5>{{ currGrade }} </h5>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="background-color: lightgray; height: 2px" />
+                <div>
+                    <table>
+                        <tr style="color: blue">
+                            <td>
+                                <h5> 知识点 </h5>
+                            </td>
+                            <td>
+                                <div style="width:30px" />
+                            </td>
+                            <td>
+                                <h5> 通过率 </h5>
+                            </td>
+                        </tr>
+                        <tr>
+                           <div style="background-color: lightgray; height: 2px" />
+                        </tr>
+                        <tr ng-repeat="pointAssess in testAssessment.pointAssessList">
+                            <td>
+                                <h5>{{ pointAssess.point_desc }} :</h5>
+                            </td>
+                            <td>
+                                <div style="width:30px" />
+                            </td>
+                            <td>
+                                <h5>{{ pointAssess.pass_rate }}</h5>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
@@ -417,30 +451,50 @@
             </div>
             <div id="question_{{ question.question_id }}" class="modal-body testDialogBodySection" style="height:300px;"
                     ng-repeat="question in taskQuestions.questions" ng-show="displayQuestion(question)">
+                <div ng-show="displayResultInQuest(question)" style="text-align: right">
+                    <img id="image_question_result_{{ question.question_id }}"
+                         style="height:40px;width:40px;" />
+                </div>
                 <table>
                     <tr>
                         <td>
-                            <span style="font-size:25px">{{ question.content }}</span>
+                            <table ng-show="displaySimpleQuestContent(question)">
+                                <tr>
+                                    <td ng-show="displaySimpleQuestContent(question, 'part0')">
+                                        <span style="font-size:25px">{{ question.questContent.part0 }}</span>
+                                    </td>
+                                    <td style="width:20px" ng-show="displaySimpleQuestAnswer(question, 'answer0')"/>
+                                    <td ng-show="displaySimpleQuestAnswer(question, 'answer0')">
+                                        <input type="text" id="{{ question.question_id }}_answer0"
+                                               style="width:70px;font-size:25px;text-align: center"
+                                               ng-model="question.questAnswer.answer0"
+                                               ng-disabled="notStarted" />
+                                    </td>
+                                    <td style="width:20px" ng-show="displaySimpleQuestContent(question, 'part1')"/>
+                                    <td ng-show="displaySimpleQuestContent(question, 'part1')">
+                                        <span style="font-size:25px">{{ question.questContent.part1 }}</span>
+                                    </td>
+                                    <td style="width:20px" ng-show="displaySimpleQuestAnswer(question, 'answer1')"/>
+                                    <td ng-show="displaySimpleQuestAnswer(question, 'answer1')">
+                                        <input type="text" id="{{ question.question_id }}_answer1"
+                                               style="width:70px;font-size:25px;text-align: center"
+                                               ng-model="question.questAnswer.answer1"
+                                               ng-disabled="notStarted" />
+                                    </td>
+                                    <td style="width:20px" ng-show="displaySimpleQuestContent(question, 'part2')"/>
+                                    <td ng-show="displaySimpleQuestContent(question, 'part2')">
+                                        <span style="font-size:25px">{{ question.questContent.part2 }}</span>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                         <td>
-                            <div style="width:20px" />
-                        </td>
-                        <td>
-                            <div ng-show="displaySimpleQuestAnswer(question)"
-                                 style="font-size:25px">
-                                =
+                            <div ng-show="displayComplexQuestContent(question)">
+                                <img id="image_question_{{ question.question_id }}"
+                                     style="height:100px;width:100px;display:none" />
                             </div>
                         </td>
                         <td>
-                            <div style="width:20px" />
-                        </td>
-                        <td>
-                            <div ng-show="displaySimpleQuestAnswer(question)">
-                                <input type="text" id="answer_{{ question.question_id }}"
-                                       style="width:100px;font-size:25px"
-                                       ng-model="question.user_answer"
-                                       ng-disabled="notStarted" />
-                            </div>
                             <div ng-show="displayComplexQuestPic(question)">
                                 <img id="image_question_{{ question.question_id }}"
                                      style="height:100px;width:100px;display:none" />
@@ -496,6 +550,8 @@
                       ng-click="startTask()" ng-disabled="isHistoryView || !notStarted">开始</button>
                 <button type="button" class="btn btn-primary" id="btnComplete"
                       ng-click="completeTask()" ng-disabled="isHistoryView || notStarted">完成</button>
+                <button type="button" class="btn btn-primary" id="btnAssess"
+                      ng-click="viewAssessment()" ng-show="testCompleted">评估</button>
             </div>
         </div>
     </div>

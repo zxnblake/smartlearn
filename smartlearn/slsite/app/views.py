@@ -80,7 +80,7 @@ def get_subject_levels(request):
     print('subject == %s' %subject)
 
     try:
-        levels = Subject_level.objects(sbj_name=subject)
+        levels = []#Subject_level.objects(sbj_name=subject)
         lvls = []
         for level in levels:
             lvl = slutils.to_level_dict(level)
@@ -203,22 +203,19 @@ def get_grade_points(request):
     subject = req['subject']
 
     try:
-        gradePoints = Grade_point.objects(sbj_name=subject)
         gpmap = {}
-        for gp in gradePoints:
-            grade = gp.grade
-            if not grade in gpmap.keys():
-                gpmap[grade] = []
-            gps = gpmap.get(grade)
-            pls = Point_level.objects(point_name=gp.point_name)
-            if len(pls) == 0:
-                continue
-            pl = pls[0]
-            point = {}
-            point['point_name'] = gp.point_name
-            point['weight'] = gp.weight
-            point['desc'] = pl.desc
-            gps.append(point)
+        grades = Grade.objects()
+        for grade in grades:
+            gradePoints = Grade_point.objects(sbj_name=subject, grade_name=grade.name)
+            gps = []
+            for gp in gradePoints:
+                point = {}
+                point['point_name'] = gp.point_name
+                point['weight'] = gp.weight
+                point['point_desc'] = gp.point_desc
+                gps.append(point)
+            gpmap[grade.desc] = gps
+
         print('gpmap: ' + simplejson.dumps(gpmap))
         resp['result'] = gpmap
     except OperationError as e:

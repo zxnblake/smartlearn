@@ -13,12 +13,12 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
         $scope.subjectLevels = [];
         $scope.subjectGradeAndPoints = {};
         $scope.gradeList = [];
-        $scope.currGrade = [];
+        $scope.currGrade = '';
         $scope.currPointList = [];
         $scope.selectedPoints = [];
         $scope.currLevel = {};
         $scope.challengeLevel = '1';
-        $scope.taskQuestions = [];
+        $scope.taskQuestions = {};
         $scope.userAssessment = {};
         $scope.userSubjLevel = '';
         $scope.userSubjWeakPoints = '';
@@ -26,12 +26,17 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
         $scope.gotoQuestNum = 0;
         $scope.displayResult = false;
         $scope.resultLines = [];
+        $scope.questContent = {'part0':'', 'part1':'',
+            'part2':'', 'part3':'', 'part4':''};
+        $scope.questAnswer = {'answer0':'', 'answer1':'',
+            'answer2':'', 'answer3':''};
 
         $scope.notStarted = true;
         $scope.startedTime = "";
         $scope.timeUsed = "";
         $scope.timeUsedStr = "0 分 0 秒";
         $scope.testCompleted = false;
+        $scope.testAssessment = {}
 
         $scope.homeworkHistoryDialog = angular.element('#homeworkHistoryDialog');
         $scope.taskDialog = angular.element('#taskDialog');
@@ -178,24 +183,44 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
             for ( var i in questions )
             {
                 var question = questions[i];
-                var qid = question.question_id;
-                var answerElement = document.getElementById('answer_' + qid);
-                var userAnswer = answerElement.value;
-                if ( userAnswer == "" )
+                //var qid = question.question_id;
+                //var answerElement = document.getElementById('answer_' + qid);
+                //var userAnswer = answerElement.value;
+                var answers = question.questAnswer;
+                var userAnswer = answers['answer0'];
+                var notAnswered = (userAnswer == '')
+                for ( var j=1; j<4; j++ )
+                {
+                    var ans = answers['answer'+j];
+                    if ( ans != '--' && ans != '' )
+                    {
+                        userAnswer += '--' + ans;
+                        notAnswered = false;
+                    }
+                }
+                if ( notAnswered )
                 {
                     $scope.showMessageBox('提示', '题目未完成，请全部完成后再提交。不会的题目可以写 ？。');
                     return;
                 }
+                question.user_answer = userAnswer;
             }
             var correctCount = 0;
             var questCount = questions.length;
             for ( var i=0; i<questCount; i++ )
             {
                 var question = questions[i];
-                var qid = question.question_id;
-                var answerElement = document.getElementById('answer_'+qid);
-                var userAnswer = answerElement.value;
-                question.user_answer = userAnswer;
+                for ( var j=0; j<4; j++ )
+                {
+                    var ans = question.questAnswer['answer'+j];
+                    if ( ans != '--' )
+                    {
+                        var answerElement =
+                            document.getElementById(question.question_id + '_answer' + j);
+                        answerElement.disabled = true;
+                    }
+                }
+
                 var line = Math.floor(i / 5);
                 var col = i % 5;
                 var label_question =
@@ -204,7 +229,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                 var check_result_image =
                     document.getElementById('image_result_'+ line + '_' + col);
 				check_result_image.style.visibility = "visible";
-                if ( userAnswer != question.answer )
+                if ( question.user_answer != question.answer )
                 {
                     question.correct = 'false';
                     check_result_image.src = "images/wrong.png";
@@ -214,7 +239,6 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                     question.correct = 'true';
                     check_result_image.src = "images/correct.png";
                     correctCount++;
-                    answerElement.disabled = true;
                 }
             }
             $scope.showTestResult();
@@ -242,6 +266,13 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                             $scope.messageText = '挑战失败';
                         }
                         window.parent.$('#messageBox').modal('show');
+                    }
+                    else if ( $scope.taskQuestions.type == TASK_TYPE_ASSESS_TEST )
+                    {
+                        if (resp.code == '0')
+                        {
+                            $scope.testAssessment = resp.result;
+                        }
                     }
 				},
 				function(err)
@@ -515,13 +546,20 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 			);
 	  	};
 
-        $scope.createAssessTest = function()
+        $scope.initTestEnv = function()
         {
             $scope.isHistoryView = false;
-            $scope.timeUsedStr = "0 分 0 秒";
     		$scope.notStarted = true;
             $scope.testCompleted = false;
-            $scope.taskDialogTitle = '小测试 : ' + $scope.currGrade + " 年级";
+            $scope.displayResult = false;
+            $scope.currQuestNum = 1;
+            $scope.timeUsedStr = "0 分 0 秒";
+        }
+
+        $scope.createAssessTest = function()
+        {
+            $scope.initTestEnv();
+            $scope.taskDialogTitle = '小测试 : ' + $scope.currGrade;
             window.parent.$('#selectGradeDialog').modal('hide');
             var param = {subject:$scope.subject, grade: $scope.currGrade,
                 selectedPoints: $scope.selectedPoints,
@@ -534,6 +572,25 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                         $scope.taskQuestions = resp.result;
                         $scope.currQuestText = $scope.getCurrQuestText();
                         var questions = $scope.taskQuestions.questions;
+                        for ( var i in questions )
+                        {
+                            var quest = questions[i];
+                            var contArry = quest.content.split("$ANSWER");
+                            var questAnswer = {'answer0':'--', 'answer1':'--',
+                                'answer2':'--', 'answer3':'--'};
+                            var questContent = {'part0':'', 'part1':'',
+                                'part2':'', 'part3':'', 'part4':''};
+                            for ( var j in contArry )
+                            {
+                                questContent['part'+j] = contArry[j];
+                                if ( j > 0 )
+                                {
+                                    questAnswer['answer'+(j-1)] = '';
+                                }
+                            }
+                            quest['questContent'] = questContent;
+                            quest['questAnswer'] = questAnswer;
+                        }
                         var linecount = Math.floor((questions.length-1) / 5) + 1;
                         for ( var i=0; i<linecount; i++ )
                         {
@@ -552,6 +609,16 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 					console.log("Error occurred when submitting grade selection: " + err);
 				}
 			);
+        }
+
+        $scope.displaySimpleQuestContent = function(question, partj)
+        {
+            return question.questContent[partj] != '';
+        }
+
+        $scope.displaySimpleQuestAnswer = function(question, answerj)
+        {
+            return question.questAnswer[answerj] != '--';
         }
 
     	$scope.setDialogOnShownFunc = function()
@@ -648,9 +715,9 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
             return false;
         }
 
-        $scope.displaySimpleQuestAnswer = function(question)
+        $scope.displaySimpleQuestContent = function(question)
         {
-            if ( question.type == "simple" )
+            if ( question.type != "complex" )
             {
                 return true;
             }
@@ -740,7 +807,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
             $scope.displayResult = false;
         }
 
-        $scope.displayQuestResult = function(line, col)
+         $scope.displayQuestResult = function(line, col)
         {
             var questions = $scope.taskQuestions.questions;
             if ( !questions )
@@ -760,6 +827,32 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
             $scope.displayResult = true;
             $scope.currQuestNum = 0;
             $scope.currQuestText = $scope.getCurrQuestText();
+        }
+
+        $scope.displayResultInQuest = function(question)
+        {
+            var question_result_image =
+                document.getElementById('image_question_result_'+ question.question_id);
+            if ( question.correct == '' )
+            {
+                return false;
+            }
+
+            if ( question.correct == 'false' )
+            {
+                question_result_image.src = "images/wrong.png";
+            }
+            else
+            {
+                question_result_image.src = "images/correct.png";
+            }
+            return true;
+        }
+
+        $scope.viewAssessment = function()
+        {
+            window.parent.$('#testDialog').modal('hide');
+            window.parent.$('#assessmentDialog').modal('show');
         }
 
         $scope.waitData = function()

@@ -7,37 +7,40 @@ function ClearDB()
     this.cleardb = function(db)
     {
         // Table: user
-        db.user.remove({});
+        db.user.drop();
 
         // Table: subject
-        db.subject.remove({});
-
-        // Table: subject_point
-        db.subject_point.remove({});
+        db.subject.drop();
 
         // Table: question
-        db.question.remove({});
+        db.question.drop();
 
         // Table: assessment
-        db.assessment.remove({});
+        db.assessment.drop();
 
         // Table: daily_task
-        db.daily_task.remove({});
+        db.daily_task.drop();
 
         // Table: task_question
-        db.task.remove({});
+        db.task.drop();
 
         // Table: task_question
-        db.task_question.remove({});
-
-        // Table: level
-        db.subject_level.remove({});
+        db.task_question.drop();
 
         // Table: grade_point
-        db.grade_point.remove({});
+        db.grade.drop();
+
+        // Table: grade_point
+        db.grade_point.drop();
 
         // Table: point_level
-        db.point_level.remove({});
+        db.point_level.drop();
+
+        // Table: grade_point
+        db.test_assess.drop();
+
+        // Table: point_level
+        db.point_assess.drop();
 
         print('The metadb has been cleared.');
     }

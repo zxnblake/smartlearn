@@ -85,9 +85,9 @@ class TaskManager:
         startTime = taskSubmit['start_time']
         timeUsed = taskSubmit['time_used']
         score = taskSubmit['score']
-        questions = taskSubmit['questions']
+        taskQuestions = taskSubmit['questions']
         subject = taskSubmit['sbj_name']
-        level = taskSubmit['level']
+        grade = taskSubmit['level']
         userName = taskSubmit['user_name']
 
         try:
@@ -98,32 +98,57 @@ class TaskManager:
                 print('start to update the task with submitted result...')
                 task.update(start_time=startTime, time_used=timeUsed, score=score)
 
-                print('start to update the task questions...')
-                for quest in questions:
-                    questions = Task_question.objects(task_id=taskid,
-                                                      question_id=quest['question_id'])
-                    question = questions[0]
-                    question.update(user_answer=quest['user_answer'],
+                print('process the questions one by one')
+                ptcount = {}
+                pterror = {}
+                for quest in taskQuestions:
+                    # update task question
+                    tqs = Task_question.objects(task_id=taskid,
+                                                question_id=quest['question_id'])
+                    taskQuest = tqs[0]
+                    taskQuest.update(user_answer=quest['user_answer'],
                                     correct=quest['correct'])
 
-                    # update error track table
-                    errtrks = Error_track.objects(user_name=userName,
-                                                  question_id=quest['question_id'])
-                    print('error tracks == ' + str(errtrks))
-                    if len(errtrks) == 1:
-                        errtrk = errtrks[0]
-                        if quest['correct'] == 'false':
-                            errtime = int(errtrk['error_repeat_count']) + 1
-                            errtrk.update(user_answer=quest['user_answer'],
-                                          error_repeat_count=str(errtime))
-                        else:
-                            errtrk.delete()
-                    else:
-                        if quest['correct'] == 'false':
-                            errtrk = Error_track(user_name=userName, question_id=quest['question_id'],
-                                                 user_answer=quest['user_answer'], error_repeat_count='1')
-                            errtrk.save()
-                            print('insert new error tracks: ', str(errtrk))
+                    # handle error track
+                    self.__handleErrorTrack(quest, userName)
+
+                    # handle statistics
+                    questions = Question.objects(id=quest['question_id'])
+                    question = questions[0]
+                    print('question : ', question)
+                    self.__handlePointStat(quest, question.grade_point, ptcount, pterror)
+
+                print('ptcount : ', ptcount)
+                print('pterror : ', pterror)
+                newTestAssess = Test_assess(user_name=userName, sbj_name=subject,
+                                            grade=grade, task_id=str(task.id))
+                newTestAssess.save()
+                ntas = Test_assess.objects(task_id=str(task.id))
+                if len(ntas) == 1:
+                    nta = ntas[0]
+                    print('new test assess is added with id=%s' % str(nta.id))
+                    testAssess = {'user_name': userName, 'sbj_name': subject,
+                                  'grade': grade, 'test_assess_id': str(nta.id)}
+                    pointAssessList = []
+                    for point in ptcount:
+                        count = ptcount[point]
+                        errCount = pterror[point]
+                        correctCount = count - errCount
+                        passRate = float(correctCount) / float(count)
+                        passRate = str('%.2f' % passRate)
+                        newPointAssess = Point_assess(test_assess_id=str(nta.id),
+                                                      point_name=point,
+                                                      quest_count=str(count),
+                                                      correct_count=str(correctCount),
+                                                      pass_rate=passRate)
+                        newPointAssess.save()
+                        gradePoints = Grade_point.objects(point_name=point)
+                        gradePoint = gradePoints[0]
+                        pa = {'point_desc': gradePoint.point_desc, 'pass_rate': passRate}
+                        pointAssessList.append(pa)
+
+                    testAssess['pointAssessList'] = pointAssessList
+                    resp['result'] =  testAssess
             else:
                 resp['code'] = 140
                 resp['result'] = "failed to find the task"
@@ -134,12 +159,37 @@ class TaskManager:
             resp['message'] = "error occurred when querying database"
 
         if score == 100:
-            assessments = Assessment.objects(user_name=userName, sbj_name=subject)
-            assess = assessments[0]
-            nextlevel = str(int(level) + 1)
-            assess.update(level=level, next_level=nextlevel)
-            resp['code'] = '1000';
-            print('succeed to pass the challenge, upgrade to the new level: ' + nextlevel)
+            print('succeeded to pass the test, very good performance!')
+
+    def __handlePointStat(self, quest, pt, ptcount, pterror):
+        print('question points: ', pt)
+        if pt in ptcount:
+            ptcount[pt] += 1
+        else:
+            ptcount[pt] = 1
+            pterror[pt] = 0
+        if quest['correct'] == 'false':
+            if pt in pterror:
+                pterror[pt] += 1
+
+    def __handleErrorTrack(self, quest, userName):
+        errtrks = Error_track.objects(user_name=userName,
+                                      question_id=quest['question_id'])
+        print('error tracks == ' + str(errtrks))
+        if len(errtrks) == 1:
+            errtrk = errtrks[0]
+            if quest['correct'] == 'false':
+                errtime = int(errtrk['error_repeat_count']) + 1
+                errtrk.update(user_answer=quest['user_answer'],
+                              error_repeat_count=str(errtime))
+            else:
+                errtrk.delete()
+        else:
+            if quest['correct'] == 'false':
+                errtrk = Error_track(user_name=userName, question_id=quest['question_id'],
+                                     user_answer=quest['user_answer'], error_repeat_count='1')
+                errtrk.save()
+                print('insert new error tracks: ', str(errtrk.id))
 
     def get_task_history(self, args, resp):
         userName = args['userName']
@@ -199,23 +249,13 @@ class TaskManager:
         questions = Question.objects(sbj_name=subject, level=level)
         return questions
 
-    def __get_questions_by_point(self, subject, questPoints):
-        questions = Question.objects(sbj_name=subject)
-        selQuests = []
-        for q in questions:
-            qps = q.sbj_points.split(',')
-            pok = True
-            for p in qps:
-                if not p in questPoints:
-                    pok = False
-                    break
-            if pok:
-                selQuests.append(q)
-        return selQuests
+    def __get_questions_by_point(self, subject, questPoint):
+        questions = Question.objects(sbj_name=subject, grade_point=questPoint)
+        return questions
 
     def create_test(self, args, resp):
         subject = args['subject']
-        grade = args['grade']
+        gradeDesc = args['grade']
         points = args['selectedPoints']
         userName = args['userName']
         taskType = args['taskType']
@@ -226,17 +266,17 @@ class TaskManager:
             selectedQuestions = []
             pointNum = {}
             questNum = 0
-            gradePoints = Grade_point.objects(sbj_name=subject, grade=grade)
+            grades = Grade.objects(desc=gradeDesc)
+            grade = grades[0]
+            gradePoints = Grade_point.objects(sbj_name=subject, grade_name=grade.name)
             for gp in gradePoints:
                 if gp.point_name in points:
                     num = int(int(gp.weight) * rate)
                     print('num = ', num)
                     pointNum[gp.point_name] = num
                     if num > 0:
-                        ptls = Point_level.objects(point_name=gp.point_name)
-                        questPoints = ptls[0].level_points.split(',')
-                        quests = self.__get_questions_by_point(subject, questPoints)
-                        print('questPoints = ', questPoints)
+                        quests = self.__get_questions_by_point(subject, gp.point_name)
+                        print('questPoints = ', points)
                         print('quests = ', quests)
                         selQuests = self.__select_rand_questions(quests, num)
                         selectedQuestions.extend(selQuests)
@@ -249,8 +289,9 @@ class TaskManager:
             today = datetime.date.today()
             ctime = int(time.time())
             taskNew = Task(type=taskType, user_name=userName, sbj_name=subject,
-                        date=str(today), create_time=str(ctime), time_used='',
-                        time_limit='', question_num=str(questNum), score='')
+                           level=grade.name, date=str(today), create_time=str(ctime),
+                           time_used='', time_limit='', question_num=str(questNum),
+                           score='')
             taskNew.save()
             tasks = Task.objects(user_name=userName, sbj_name=subject,
                                 create_time=str(ctime))

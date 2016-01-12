@@ -13,22 +13,10 @@ class Subject(Document):
     name = StringField(max_length=128)
 
 
-class Subject_point(Document):
-    point = StringField(max_length=128)
-    sbj_name = StringField(max_length=128)
-
-
-class Subject_level(Document):
-    level = StringField(max_length=128)
-    sbj_name = StringField(max_length=128)
-    desc = StringField()
-    level_points = StringField()
-
-
 class Question(Document):
     sbj_name = StringField(max_length=128)
     content = StringField()
-    sbj_points = StringField()
+    grade_point = StringField()
     level = StringField()
     answer = StringField()
     type = StringField(max_length=32)
@@ -77,15 +65,35 @@ class Error_track(Document):
     error_repeat_count = StringField()
 
 
+class Grade(Document):
+    name = StringField()
+    desc = StringField()
+
+
 class Grade_point(Document):
-    grade = StringField(max_length=36)
+    grade_name = StringField(max_length=36)
     sbj_name = StringField(max_length=128)
     point_name = StringField()
     weight = StringField()
+    point_desc = StringField()
 
 
-class Point_level(Document):
-    point_name = StringField()
+class Test_assess(Document):
+    user_name = StringField(max_length=128)
     sbj_name = StringField(max_length=128)
+    grade = StringField(max_length=36)
+    task_id = StringField()
+
+
+class Point_assess(Document):
+    test_assess_id = StringField()
+    point_name = StringField()
+    quest_count = StringField()
+    correct_count = StringField()
+    pass_rate = StringField()
+
+
+class Question_type(Document):
+    type_name = StringField()
     desc = StringField()
-    level_points = StringField()
+
