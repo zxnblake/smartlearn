@@ -5,6 +5,7 @@
 load('questAddSubHelper.js');
 load('questCompareHelper.js');
 load('questSequenceHelper.js');
+load('questFigureHelper.js');
 
 function QuestionHelper()
 {
@@ -20,8 +21,10 @@ function QuestionHelper()
         ql2 = questCompareHelper.createQuestions();
         var questSequenceHelper = new QuestSequenceHelper();
         ql3 = questSequenceHelper.createQuestions();
+        var questFigureHelper = new QuestFigureHelper();
+        ql4 = questFigureHelper.createQuestions();
 
-        questions = ql1.concat(ql2, ql3);
+        questions = ql1.concat(ql2, ql3, ql4);
         return questions;
     }
 }

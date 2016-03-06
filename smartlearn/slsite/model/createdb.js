@@ -71,6 +71,9 @@ db.grade_point.insert({'sbj_name':'数学', 'grade_name':'11',
 db.grade_point.insert({'sbj_name':'数学', 'grade_name':'11',
     'point_name':'sequence-simple', 'weight':'20',
     'point_desc':'数的序列初步'});
+db.grade_point.insert({'sbj_name':'数学', 'grade_name':'11',
+    'point_name':'figure-simple', 'weight':'20',
+    'point_desc':'图形和方位'});
 db.grade_point.insert({'sbj_name':'数学', 'grade_name':'12',
     'point_name':'addsub-less-100', 'weight':'60',
     'point_desc':'100 以内加减法'});
@@ -79,5 +82,16 @@ print('Start to create the question_type data.');
 db.question_type.insert({'type_name':'basic', 'desc':'基本类型'});
 db.question_type.insert({'type_name':'carry1', 'desc':'加法一次进位'});
 db.question_type.insert({'type_name':'borrow1', 'desc':'减法一次借位'});
+
+print('Start to create the geometric figure data.');
+db.figure.insert({'figure_id':'square', 'name':'正方形', 'type':'2d'});
+db.figure.insert({'figure_id':'rectangle', 'name':'长方形', 'type':'2d'});
+db.figure.insert({'figure_id':'circle', 'name':'圆形', 'type':'2d'});
+db.figure.insert({'figure_id':'regular_triangle', 'name':'正三角形', 'type':'2d'});
+db.figure.insert({'figure_id':'rightangled_triangle', 'name':'直角三角形', 'type':'2d'});
+db.figure.insert({'figure_id':'regular_pentagon', 'name':'正五边形', 'type':'2d'});
+db.figure.insert({'figure_id':'regular_hexagon', 'name':'正六边形', 'type':'2d'});
+db.figure.insert({'figure_id':'trapezia', 'name':'梯形', 'type':'2d'});
+db.figure.insert({'figure_id':'parallelogram', 'name':'平行四边形', 'type':'2d'});
 
 print('The metadb has been created successfully.');

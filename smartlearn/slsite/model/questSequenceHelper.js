@@ -1,5 +1,5 @@
 /**
- * Created by admin on 1/5/16.
+ * Created by Xiao Ning Zhang on 1/5/16.
  */
 
 load('commUtil.js');
@@ -30,9 +30,10 @@ function QuestSequenceHelper()
         // fibonacci sequence
         var cont = "1, 1, 2, 3, 5, 8, $ANSWER, 21, $ANSWER, 55";
         var result = "13--34";
-        var q = {'sbj_name':'数学', 'content':cont, 'grade_point':'sequence-simple',
-             'answer':result, 'type':'seq-fibonacci',
-             'answer_label':'', 'content_pic':''};
+        var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'sequence-simple',
+                     'point_type':'seq-fibonacci', 'difficulty':'medium',
+                     'answer':result, 'type':'basic'};
+        var q = util.createQuestion(props);
         seqs.push(q);
 
         // mixed equal-diff sequence like: 1, 10, 2, 9, 3, 8...
@@ -57,9 +58,10 @@ function QuestSequenceHelper()
             }
             result = this.setAnswerInSeq(seq);
             var cont = this.seq2Str(seq);
-            var q2 = {'sbj_name':'数学', 'content':cont, 'grade_point':'sequence-simple',
-                 'answer':result, 'type':'seq-equal-diff-mixed',
-                 'answer_label':'', 'content_pic':''};
+            var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'sequence-simple',
+                         'point_type':'seq-equal-diff-mixed', 'difficulty':'easy',
+                         'answer':result, 'type':'simple'};
+            var q2 = util.createQuestion(props);
             seqs.push(q2);
         }
         return seqs;
@@ -76,9 +78,10 @@ function QuestSequenceHelper()
                 var seq = this.genOneEqualDiffSeq(startOpts[i], diffOpts[j], len);
                 result = this.setAnswerInSeq(seq);
                 var cont = this.seq2Str(seq);
-                var q = {'sbj_name':'数学', 'content':cont, 'grade_point':'sequence-simple',
-                     'answer':result, 'type':'seq-equal-diff',
-                     'answer_label':'', 'content_pic':''};
+                var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'sequence-simple',
+                             'point_type':'seq-equal-diff-mixed', 'difficulty':'easy',
+                             'answer':result, 'type':'simple'};
+                var q = util.createQuestion(props);
                 seqs.push(q);
             }
         }

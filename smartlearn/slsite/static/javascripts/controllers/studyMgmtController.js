@@ -215,9 +215,12 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                     var ans = question.questAnswer['answer'+j];
                     if ( ans != '--' )
                     {
-                        var answerElement =
-                            document.getElementById(question.question_id + '_answer' + j);
-                        answerElement.disabled = true;
+                        if ( question.type == 'simple' )
+                        {
+                            var answerElement =
+                                document.getElementById(question.question_id + '_answer' + j);
+                            answerElement.disabled = true;
+                        }
                     }
                 }
 
@@ -554,7 +557,67 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
             $scope.displayResult = false;
             $scope.currQuestNum = 1;
             $scope.timeUsedStr = "0 分 0 秒";
-        }
+        };
+
+        $scope.parseBasicQuest = function(quest)
+        {
+            var contArry = quest.content.split("$ANSWER");
+            var questContent = {'part0':'', 'part1':'',
+                'part2':'', 'part3':'', 'part4':''};
+            for ( var j in contArry )
+            {
+                questContent['part'+j] = contArry[j];
+                if ( j > 0 )
+                {
+                    quest.questAnswer['answer'+(j-1)] = '';
+                }
+            }
+            quest['questContent'] = questContent;
+        };
+
+        $scope.parseComplexQuest = function(quest)
+        {
+            quest.complexQuestPicArry = [];
+            quest.complexQuestArry = [];
+            quest.complexQuestAnsOptArry = [];
+
+            if ( quest.content_pic != '' )
+            {
+                var picArry = quest.content_pic.split("^^");
+                for ( var i in picArry )
+                {
+                    quest.complexQuestPicArry[i] = [];
+                    var picOnelineArry = picArry[i].split("--");
+                    for ( var j in picOnelineArry )
+                    {
+                        quest.complexQuestPicArry[i][j] = picOnelineArry[j];
+                    }
+                }
+            }
+
+            if ( quest.quest_text != '' )
+            {
+                var questArry = quest.quest_text.split("--");
+                for ( var i in questArry )
+                {
+                    quest.complexQuestArry[i] = questArry[i];
+                }
+            }
+
+            if ( quest.answer_options != '' )
+            {
+                var optArry = quest.answer_options.split("--");
+                for ( var i in optArry )
+                {
+                    quest.complexQuestAnsOptArry[i] = [];
+                    var optOnelineArry = optArry[i].split("__");
+                    for ( var j in optOnelineArry )
+                    {
+                        quest.complexQuestAnsOptArry[i][j] = optOnelineArry[j];
+                    }
+                }
+            }
+        };
 
         $scope.createAssessTest = function()
         {
@@ -575,21 +638,16 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
                         for ( var i in questions )
                         {
                             var quest = questions[i];
-                            var contArry = quest.content.split("$ANSWER");
-                            var questAnswer = {'answer0':'--', 'answer1':'--',
-                                'answer2':'--', 'answer3':'--'};
-                            var questContent = {'part0':'', 'part1':'',
-                                'part2':'', 'part3':'', 'part4':''};
-                            for ( var j in contArry )
-                            {
-                                questContent['part'+j] = contArry[j];
-                                if ( j > 0 )
-                                {
-                                    questAnswer['answer'+(j-1)] = '';
-                                }
-                            }
-                            quest['questContent'] = questContent;
+                            var questAnswer = {'answer0':'--', 'answer1':'--', 'answer2':'--', 'answer3':'--'};
                             quest['questAnswer'] = questAnswer;
+                            if ( quest.type == "simple" )
+                            {
+                                $scope.parseBasicQuest(quest);
+                            }
+                            else
+                            {
+                                $scope.parseComplexQuest(quest);
+                            }
                         }
                         var linecount = Math.floor((questions.length-1) / 5) + 1;
                         for ( var i=0; i<linecount; i++ )
@@ -611,14 +669,23 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 			);
         }
 
+        $scope.isNotEmpty = function(obj)
+        {
+            return obj != undefined && obj != '';
+        }
+
         $scope.displaySimpleQuestContent = function(question, partj)
         {
-            return question.questContent[partj] != '';
+            return $scope.isNotEmpty(question.questContent);
         }
 
         $scope.displaySimpleQuestAnswer = function(question, answerj)
         {
-            return question.questAnswer[answerj] != '--';
+            if ( $scope.isNotEmpty(question.questAnswer) )
+            {
+                return question.questAnswer[answerj] != '--';
+            }
+            return false;
         }
 
     	$scope.setDialogOnShownFunc = function()
@@ -715,9 +782,18 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
             return false;
         }
 
-        $scope.displaySimpleQuestContent = function(question)
+        $scope.displayComplexQuestTextDesc = function(question)
         {
-            if ( question.type != "complex" )
+            if ( question.type != "simple" )
+            {
+                return true;
+            }
+            return false;
+        }
+
+        $scope.displaySimpleQuestion = function(question)
+        {
+            if ( question.type == "simple" )
             {
                 return true;
             }
@@ -726,7 +802,16 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 
         $scope.displayComplexQuestAnswer = function(question)
         {
-            if ( question && question.type == "complex" )
+            if ( question && question.type != "simple" )
+            {
+                return true;
+            }
+            return false;
+        }
+
+        $scope.displayComplexQuestAnsOptions = function(question)
+        {
+            if ( question && question.type != "simple" && question.answer_options != "" )
             {
                 return true;
             }
@@ -735,7 +820,7 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
 
         $scope.displayComplexQuestPic = function(question)
         {
-            if ( question && question.type == "complex_with_pic" )
+            if ( question && question.type != "simple" && question.content_pic != "" )
             {
                 return true;
             }
@@ -827,6 +912,20 @@ studyMgmtController.controller('studyMgmtCtrl', ['$scope', 'smartLearnService', 
             $scope.displayResult = true;
             $scope.currQuestNum = 0;
             $scope.currQuestText = $scope.getCurrQuestText();
+        }
+
+        $scope.selectQuestAns = function(question, questText, questAnsOpt)
+        {
+            var i = 0;
+            for ( i=0; i<question.complexQuestArry.length; i++ )
+            {
+                var qt = question.complexQuestArry[i];
+                if ( qt == questText )
+                {
+                    break;
+                }
+            }
+            question.questAnswer['answer' + i] = questAnsOpt;
         }
 
         $scope.displayResultInQuest = function(question)

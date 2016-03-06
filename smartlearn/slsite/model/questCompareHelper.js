@@ -42,9 +42,10 @@ compare_less_20 = function(i, j)
         result = ">";
     }
     var cont = i + " $ANSWER " + j;
-    var quest = {'sbj_name':'数学', 'content':cont, 'grade_point':'comparison-simple',
-                 'answer':result, 'type':'basic',
-                 'answer_label':'', 'content_pic':''};
+    var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'comparison-simple',
+                 'point_type':'comparison', 'difficulty':'easy',
+                 'answer':result, 'type':'simple'};
+    var quest = util.createQuestion(props);
     return quest;
 };
 
@@ -87,9 +88,10 @@ compare_addsub_less_20 = function(num)
             result = ">";
         }
         var cont = randFormula1.str + " $ANSWER " + randFormula2.str;
-        var quest = {'sbj_name':'数学', 'content':cont, 'grade_point':'comparison-simple',
-                     'answer':result, 'type':'addsub',
-                     'answer_label':'', 'content_pic':''};
+        var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'comparison-simple',
+                     'point_type':'comparison-addsub', 'difficulty':'easy',
+                     'answer':result, 'type':'simple'};
+        var quest = util.createQuestion(props);
         questions.push(quest);
     }
 
@@ -110,13 +112,17 @@ compare_addsub_less_20 = function(num)
             result2 = "<";
         }
         var cont = randFormula1.str + " $ANSWER " + randn;
-        var quest = {'sbj_name':'数学', 'content':cont, 'grade_point':'comparison-simple',
-                     'answer':result, 'type':'addsub',
-                     'answer_label':'', 'content_pic':''};
+        var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'comparison-simple',
+                     'point_type':'comparison-addsub', 'difficulty':'easy',
+                     'answer':result, 'type':'simple'};
+        var quest = util.createQuestion(props);
+
         var cont2 = randn + " $ANSWER " + randFormula1.str;
-        var quest2 = {'sbj_name':'数学', 'content':cont2, 'grade_point':'comparison-simple',
-                     'answer':result2, 'type':'addsub',
-                     'answer_label':'', 'content_pic':''};
+        var props = {'sbj_name':'数学', 'content':cont2, 'grade_point':'comparison-simple',
+                     'point_type':'comparison-addsub', 'difficulty':'easy',
+                     'answer':result2, 'type':'simple'};
+        var quest2 = util.createQuestion(props);
+
         questions.push(quest);
         questions.push(quest2);
     }

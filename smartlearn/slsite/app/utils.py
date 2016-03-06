@@ -35,9 +35,13 @@ def to_question_dict(quest):
     q = {}
     q['question_id'] = str(quest.id)
     q['content'] = quest.content
+    q['grade_point'] = quest.grade_point
+    q['point_type'] = quest.point_type
+    q['difficulty'] = quest.difficulty
     q['answer'] = quest.answer
     q['type'] = quest.type
-    q['answer_label'] = quest.answer_label
+    q['quest_text'] = quest.quest_text
+    q['answer_options'] = quest.answer_options
     q['content_pic'] = quest.content_pic
     return q
 

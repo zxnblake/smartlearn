@@ -17,10 +17,12 @@ class Question(Document):
     sbj_name = StringField(max_length=128)
     content = StringField()
     grade_point = StringField()
-    level = StringField()
+    point_type = StringField()
+    difficulty = StringField()
     answer = StringField()
-    type = StringField(max_length=32)
-    answer_label = StringField()
+    type = StringField()
+    quest_text = StringField()
+    answer_options = StringField()
     content_pic = StringField()
 
 
@@ -97,3 +99,8 @@ class Question_type(Document):
     type_name = StringField()
     desc = StringField()
 
+
+class Geometric_figure(Document):
+    figure_id = StringField()
+    name = StringField()
+    type = StringField()

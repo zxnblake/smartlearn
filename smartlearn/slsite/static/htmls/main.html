@@ -455,60 +455,83 @@
                     <img id="image_question_result_{{ question.question_id }}"
                          style="height:40px;width:40px;" />
                 </div>
-                <table>
-                    <tr>
-                        <td>
-                            <table ng-show="displaySimpleQuestContent(question)">
-                                <tr>
-                                    <td ng-show="displaySimpleQuestContent(question, 'part0')">
-                                        <span style="font-size:25px">{{ question.questContent.part0 }}</span>
-                                    </td>
-                                    <td style="width:20px" ng-show="displaySimpleQuestAnswer(question, 'answer0')"/>
-                                    <td ng-show="displaySimpleQuestAnswer(question, 'answer0')">
-                                        <input type="text" id="{{ question.question_id }}_answer0"
-                                               style="width:70px;font-size:25px;text-align: center"
-                                               ng-model="question.questAnswer.answer0"
-                                               ng-disabled="notStarted" />
-                                    </td>
-                                    <td style="width:20px" ng-show="displaySimpleQuestContent(question, 'part1')"/>
-                                    <td ng-show="displaySimpleQuestContent(question, 'part1')">
-                                        <span style="font-size:25px">{{ question.questContent.part1 }}</span>
-                                    </td>
-                                    <td style="width:20px" ng-show="displaySimpleQuestAnswer(question, 'answer1')"/>
-                                    <td ng-show="displaySimpleQuestAnswer(question, 'answer1')">
-                                        <input type="text" id="{{ question.question_id }}_answer1"
-                                               style="width:70px;font-size:25px;text-align: center"
-                                               ng-model="question.questAnswer.answer1"
-                                               ng-disabled="notStarted" />
-                                    </td>
-                                    <td style="width:20px" ng-show="displaySimpleQuestContent(question, 'part2')"/>
-                                    <td ng-show="displaySimpleQuestContent(question, 'part2')">
-                                        <span style="font-size:25px">{{ question.questContent.part2 }}</span>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td>
-                            <div ng-show="displayComplexQuestContent(question)">
-                                <img id="image_question_{{ question.question_id }}"
-                                     style="height:100px;width:100px;display:none" />
-                            </div>
-                        </td>
-                        <td>
-                            <div ng-show="displayComplexQuestPic(question)">
-                                <img id="image_question_{{ question.question_id }}"
-                                     style="height:100px;width:100px;display:none" />
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div ng-show="displayComplexQuestAnswer(question)">
-                                <h4>{{ question.answer_text }}</h4>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+                <div ng-show="displaySimpleQuestion(question)">
+                    <table>
+                        <tr>
+                            <td ng-show="displaySimpleQuestContent(question, 'part0')">
+                                <span style="font-size:25px">{{ question.questContent.part0 }}</span>
+                            </td>
+                            <td style="width:20px" ng-show="displaySimpleQuestAnswer(question, 'answer0')"/>
+                            <td ng-show="displaySimpleQuestAnswer(question, 'answer0')">
+                                <input type="text" id="{{ question.question_id }}_answer0"
+                                       style="width:70px;font-size:25px;text-align: center"
+                                       ng-model="question.questAnswer.answer0"
+                                       ng-disabled="notStarted" />
+                            </td>
+                            <td style="width:20px" ng-show="displaySimpleQuestContent(question, 'part1')"/>
+                            <td ng-show="displaySimpleQuestContent(question, 'part1')">
+                                <span style="font-size:25px">{{ question.questContent.part1 }}</span>
+                            </td>
+                            <td style="width:20px" ng-show="displaySimpleQuestAnswer(question, 'answer1')"/>
+                            <td ng-show="displaySimpleQuestAnswer(question, 'answer1')">
+                                <input type="text" id="{{ question.question_id }}_answer1"
+                                       style="width:70px;font-size:25px;text-align: center"
+                                       ng-model="question.questAnswer.answer1"
+                                       ng-disabled="notStarted" />
+                            </td>
+                            <td style="width:20px" ng-show="displaySimpleQuestContent(question, 'part2')"/>
+                            <td ng-show="displaySimpleQuestContent(question, 'part2')">
+                                <span style="font-size:25px">{{ question.questContent.part2 }}</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div ng-show="displayComplexQuestTextDesc(question)">
+                    <span style="font-size:20px">{{ question.content }}</span>
+                </div>
+                <div style="height:20px"/>
+                <div ng-show="displayComplexQuestPic(question)">
+                    <table>
+                        <tr ng-repeat="picLine in question.complexQuestPicArry">
+                            <td ng-repeat="pic in picLine track by $index">
+                                <img id="image_{{ question.question_id }}_$index"
+                                     ng-src="images/{{ pic }}.png"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="height:20px"/>
+                <div ng-show="displayComplexQuestAnswer(question)">
+                    <table>
+                        <tr ng-repeat="questText in question.complexQuestArry track by $index">
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <span style="font-size:20px">{{ questText }}</span>
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="displayComplexQuestAnsOptions(question)">
+                                        <td>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:20px"/>
+                                                    <td ng-repeat="questAnsOpt in question.complexQuestAnsOptArry[$index]" style="width:80px">
+                                                        <input type="radio" name="options_questAnsOpts_{{ questText }}"
+                                                               id="questAnsOpt_{{ question.question_id }}_{{ questAnsOpt }}"
+                                                               ng-disabled="notStarted"
+                                                               ng-click="selectQuestAns(question, questText, questAnsOpt)" />
+                                                        <span style="font-size:15px">{{ questAnsOpt }}</span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
             <div id="test_result_page" class="modal-body testDialogBodySection" style="height:300px;"
                     ng-show="displayResult">

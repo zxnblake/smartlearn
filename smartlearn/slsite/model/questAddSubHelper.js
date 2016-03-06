@@ -66,7 +66,7 @@ add_less_20 = function(i, j)
     var questArry = [i, '+', j, '=', sum];
     var q = getQuestFromArry(questArry, 2);
     q.grade_point = 'addsub-less-20';
-    q.type = 'basic';
+    q.type = 'simple';
 
     var quest = null;
     if ( sum <= 10 )
@@ -103,7 +103,7 @@ add_less_100 = function(i, j)
     var questArry = [i, '+', j, '=', sum];
     var q = getQuestFromArry(questArry, 2);
     q.grade_point = 'addsub-less-100';
-    q.type = 'basic';
+    q.type = 'simple';
 
     var quest = null;
     if ( sum <= 50 )
@@ -151,7 +151,7 @@ subtract_less_20 = function(i, j)
     var questArry = [i, '-', j, '=', subtr];
     var q = getQuestFromArry(questArry, 2);
     q.grade_point = 'addsub-less-20';
-    q.type = 'basic';
+    q.type = 'simple';
 
     var quest = null;
     if ( (i < 10 && j < 10) || (i > 10 && j > 10) || j in [0, 1, 2])
@@ -180,7 +180,7 @@ subtract_less_100 = function(i, j)
     var questArry = [i, '-', j, '=', subtr];
     var q = getQuestFromArry(questArry, 2);
     q.grade_point = 'addsub-less-100';
-    q.type = 'basic';
+    q.type = 'simple';
 
     var quest = null;
     if ( i <= 50 && j <= 50 )
@@ -248,9 +248,9 @@ getQuestFromArry = function(questArry, nCount)
     questStr = questStr.trim();
     print('question string: ' + questStr);
     print('question answer: ' + result);
-    var q = {'sbj_name':'数学', 'content':questStr, 'grade_point':'',
-         'answer':result, 'type':'',
-         'answer_label':'', 'content_pic':''};
+    var props = {'sbj_name':'数学', 'content':questStr, 'answer':result,
+                 'difficulty':'easy', 'type':'simple'};
+    var q = util.createQuestion(props);
     return q;
 };
 
@@ -266,7 +266,7 @@ genAddSubMixQuests = function(questNum, nCount, max)
         print('question array: ' + questArry);
         var q = getQuestFromArry(questArry, nCount);
         q.grade_point = 'addsub-less-'+max;
-        q.type = 'addsub-mixed';
+        q.point_type = 'addsub-mixed';
         quests.push(q);
     }
     return quests;
@@ -372,9 +372,10 @@ genAddQuestsUpper100 = function(num)
         var sumstr = (a1 + a2).toString();
         var cont = a1 + " + " + a2 + " = $ANSWER";
         var sbjpts = getAddSbjPoints(a1, a2);
-        var q = {'sbj_name':'数学', 'content':cont, 'grade_point':'subtract-4',
-                    'level':'5', 'answer':sumstr.toString(), 'type':'simple',
-                    'answer_label':'', 'content_pic':''};
+        var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'subtract-4',
+                     'point_type':'subtract', 'difficulty':'easy',
+                     'answer':sumstr.toString(), 'type':'simple'};
+        var q = util.createQuestion(props);
         if ( sbjpts == 'addition-5' && i < num )
         {
             quests.unshift(q);
@@ -442,9 +443,10 @@ genSubtQuestsUpper100 = function(num)
         var subtstr = (s1 - s2).toString();
         var cont = s1 + " - " + s2 + " = $ANSWER";
         var sbjpts = getSubtrSbjPoints(s1, s2);
-        var q = {'sbj_name':'数学', 'content':cont, 'grade_point':sbjpts,
-                    'level':'5', 'answer':subtstr, 'type':'simple',
-                    'answer_label':'', 'content_pic':''};
+        var props = {'sbj_name':'数学', 'content':cont, 'grade_point':sbjpts,
+                     'point_type':'subtract', 'difficulty':'easy',
+                     'answer':subtstr, 'type':'simple'};
+        var q = util.createQuestion(props);
         if ( sbjpts == 'subtract-5' && i < num )
         {
             quests.push(q);
