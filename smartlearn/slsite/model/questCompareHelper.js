@@ -2,11 +2,22 @@
  * Created by Xiao Ning Zhang on 12/29/15.
  */
 load('commUtil.js');
+load('constants.js');
 
 util = new CommUtil();
+constants = new Constants();
 
 function QuestCompareHelper()
 {
+    this.QUESTION_APPLICATION_COMPARE_TYPE = [
+        ["身高", "高", "矮"],
+        ["体重", "重", "轻"],
+        ["赛跑", "快", "慢"]
+    ];
+
+    this.QUESTION_APPLICATION_COMPARE_TEMPLATE =
+        "$COMPARE_CASE。 $COMPARE_CONDITION。$COMPARE_QUESTION。(注：答案的示例为：a c b)";
+
     this.createQuestions = function()
     {
         var questions = [];
@@ -24,9 +35,35 @@ function QuestCompareHelper()
             }
         }
         var ql2 = compare_addsub_less_20(50);
+        var ql3 = compare_application();
 
-        questions = ql1.concat(ql2);
+        questions = ql1.concat(ql2, ql3);
         return questions;
+    }
+};
+
+compare_application = function()
+{
+    var questions = [];
+    for ( var k=3; k<6; k++ )
+    {
+        for ( var i=0; i<10; i++ )
+        {
+            var persons = util.genRandNumArrayInRangeDiff(0, 6, k);
+            var compType = util.genRandNumInRange(0, 3);
+            var compCase = getCompCase(persons, compType);
+            var compCondition = getCompCondition(persons, compType);
+            var compQuest = getCompQuest(persons, compType);
+            var cont = this.QUESTION_APPLICATION_COMPARE_TEMPLATE;
+            cont = cont.replace("$COMPARE_CASE", compCase);
+            cont = cont.replace("$COMPARE_CONDITION", compCondition);
+            cont = cont.replace("$COMPARE_QUESTION", compQuest);
+
+            var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'comparison-simple',
+                         'point_type':'application', 'level':constants.QUESTION_LEVEL_BASIC,
+                         'answer':result, 'type':'simple'};
+            var quest = util.createQuestion(props);
+        }
     }
 };
 
@@ -43,7 +80,7 @@ compare_less_20 = function(i, j)
     }
     var cont = i + " $ANSWER " + j;
     var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'comparison-simple',
-                 'point_type':'comparison', 'difficulty':'easy',
+                 'point_type':'comparison', 'level':constants.QUESTION_LEVEL_BASIC,
                  'answer':result, 'type':'simple'};
     var quest = util.createQuestion(props);
     return quest;
@@ -89,7 +126,7 @@ compare_addsub_less_20 = function(num)
         }
         var cont = randFormula1.str + " $ANSWER " + randFormula2.str;
         var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'comparison-simple',
-                     'point_type':'comparison-addsub', 'difficulty':'easy',
+                     'point_type':'comparison-addsub', 'level':constants.QUESTION_LEVEL_MEDIUM,
                      'answer':result, 'type':'simple'};
         var quest = util.createQuestion(props);
         questions.push(quest);
@@ -113,13 +150,13 @@ compare_addsub_less_20 = function(num)
         }
         var cont = randFormula1.str + " $ANSWER " + randn;
         var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'comparison-simple',
-                     'point_type':'comparison-addsub', 'difficulty':'easy',
+                     'point_type':'comparison-addsub', 'level':constants.QUESTION_LEVEL_BASIC,
                      'answer':result, 'type':'simple'};
         var quest = util.createQuestion(props);
 
         var cont2 = randn + " $ANSWER " + randFormula1.str;
         var props = {'sbj_name':'数学', 'content':cont2, 'grade_point':'comparison-simple',
-                     'point_type':'comparison-addsub', 'difficulty':'easy',
+                     'point_type':'comparison-addsub', 'level':constants.QUESTION_LEVEL_BASIC,
                      'answer':result2, 'type':'simple'};
         var quest2 = util.createQuestion(props);
 

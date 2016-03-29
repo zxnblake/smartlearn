@@ -249,8 +249,28 @@ class TaskManager:
         questions = Question.objects(sbj_name=subject, level=level)
         return questions
 
-    def __get_questions_by_point(self, subject, questPoint):
-        questions = Question.objects(sbj_name=subject, grade_point=questPoint)
+    def __get_questions_by_point(self, subject, questPoint, level, num):
+        questions = []
+        if level == 'all':
+            count1 = num / 3
+            count2 = (num - count1) / 2
+            count3 = num - count1 - count2
+            quests = self.__get_questions_by_point_level(subject, questPoint, 'basic')
+            questBasic = self.__select_rand_questions(quests, count1)
+            quests = self.__get_questions_by_point_level(subject, questPoint, 'medium')
+            questMedium = self.__select_rand_questions(quests, count2)
+            quests = self.__get_questions_by_point_level(subject, questPoint, 'advanced')
+            questAdvanced = self.__select_rand_questions(quests, count3)
+            questions.extend(questBasic)
+            questions.extend(questMedium)
+            questions.extend(questAdvanced)
+        else:
+            quests = Question.objects(sbj_name=subject, grade_point=questPoint, level=level)
+            questions = self.__select_rand_questions(quests, num)
+        return questions
+
+    def __get_questions_by_point_level(self, subject, questPoint, level):
+        questions = Question.objects(sbj_name=subject, grade_point=questPoint, level=level)
         return questions
 
     def create_test(self, args, resp):
@@ -259,6 +279,7 @@ class TaskManager:
         points = args['selectedPoints']
         userName = args['userName']
         taskType = args['taskType']
+        level = args['level']
 
         rate = 0.05
         try:
@@ -275,11 +296,10 @@ class TaskManager:
                     print('num = ', num)
                     pointNum[gp.point_name] = num
                     if num > 0:
-                        quests = self.__get_questions_by_point(subject, gp.point_name)
+                        quests = self.__get_questions_by_point(subject, gp.point_name, level, num)
                         print('questPoints = ', points)
                         print('quests = ', quests)
-                        selQuests = self.__select_rand_questions(quests, num)
-                        selectedQuestions.extend(selQuests)
+                        selectedQuestions.extend(quests)
                         questNum = questNum + num
 
             print('selectedQuestions =')
@@ -289,7 +309,7 @@ class TaskManager:
             today = datetime.date.today()
             ctime = int(time.time())
             taskNew = Task(type=taskType, user_name=userName, sbj_name=subject,
-                           level=grade.name, date=str(today), create_time=str(ctime),
+                           grade=grade.name, date=str(today), create_time=str(ctime),
                            time_used='', time_limit='', question_num=str(questNum),
                            score='')
             taskNew.save()

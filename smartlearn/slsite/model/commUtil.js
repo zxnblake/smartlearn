@@ -74,7 +74,7 @@ function CommUtil()
     this.createQuestion = function(props)
     {
         var q = {'sbj_name':'', 'content':'', 'grade_point':'',
-                 'point_type':'', 'difficulty':'', 'answer':'', 'type':'',
+                 'point_type':'', 'level':'', 'answer':'', 'type':'',
                  'quest_text':'', 'answer_options':'', 'content_pic':''};
         for ( prop in props )
         {

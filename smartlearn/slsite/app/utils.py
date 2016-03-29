@@ -20,7 +20,7 @@ def to_task_dict(task):
     d['type'] = task.type
     d['user_name'] = task.user_name
     d['sbj_name'] = task.sbj_name
-    d['level'] = task.level
+    d['grade'] = task.grade
     d['date'] = task.date
     d['create_time'] = task.create_time
     d['start_time'] = task.start_time
@@ -37,7 +37,7 @@ def to_question_dict(quest):
     q['content'] = quest.content
     q['grade_point'] = quest.grade_point
     q['point_type'] = quest.point_type
-    q['difficulty'] = quest.difficulty
+    q['level'] = quest.level
     q['answer'] = quest.answer
     q['type'] = quest.type
     q['quest_text'] = quest.quest_text

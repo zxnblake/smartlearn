@@ -3,8 +3,10 @@
  */
 
 load('commUtil.js');
+load('constants.js');
 
 util = new CommUtil();
+constants = new Constants();
 
 // just for test
 //helper = new QuestSequenceHelper();
@@ -18,23 +20,15 @@ function QuestSequenceHelper()
     {
         var questions = [];
         var ql1 = this.genEqualDiffSequences([0, 1, 2], [1, 2, 3, 4, 5, 6, 10]);
-        var ql2 = this.genSpecialSequences();
-        questions = ql1.concat(ql2);
+        var ql2 = this.genMixedEqualDiffSequences();
+        var ql3 = this.genSpecialSequences();
+        questions = ql1.concat(ql2, ql3);
         return questions;
     };
 
-    this.genSpecialSequences = function(startOpts, diffOpts)
+    this.genMixedEqualDiffSequences = function(startOpts, diffOpts)
     {
         var seqs = [];
-
-        // fibonacci sequence
-        var cont = "1, 1, 2, 3, 5, 8, $ANSWER, 21, $ANSWER, 55";
-        var result = "13--34";
-        var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'sequence-simple',
-                     'point_type':'seq-fibonacci', 'difficulty':'medium',
-                     'answer':result, 'type':'basic'};
-        var q = util.createQuestion(props);
-        seqs.push(q);
 
         // mixed equal-diff sequence like: 1, 10, 2, 9, 3, 8...
         for (var i=0; i<10; i++ )
@@ -59,7 +53,7 @@ function QuestSequenceHelper()
             result = this.setAnswerInSeq(seq);
             var cont = this.seq2Str(seq);
             var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'sequence-simple',
-                         'point_type':'seq-equal-diff-mixed', 'difficulty':'easy',
+                         'point_type':'seq-equal-diff-mixed', 'level':constants.QUESTION_LEVEL_MEDIUM,
                          'answer':result, 'type':'simple'};
             var q2 = util.createQuestion(props);
             seqs.push(q2);
@@ -79,7 +73,7 @@ function QuestSequenceHelper()
                 result = this.setAnswerInSeq(seq);
                 var cont = this.seq2Str(seq);
                 var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'sequence-simple',
-                             'point_type':'seq-equal-diff-mixed', 'difficulty':'easy',
+                             'point_type':'seq-equal-diff-mixed', 'level':constants.QUESTION_LEVEL_BASIC,
                              'answer':result, 'type':'simple'};
                 var q = util.createQuestion(props);
                 seqs.push(q);
@@ -87,6 +81,67 @@ function QuestSequenceHelper()
         }
         return seqs;
     };
+
+    this.genSpecialSequences = function(startOpts, diffOpts)
+    {
+        var seqs = [];
+
+        // sequence like: 1, 1, 5, 2, 2, 10, 3, 3, 15
+        var cont = "1, 1, 5, 2, 2, 10, 3, 3, 15, $ANSWER, $ANSWER, $ANSWER";
+        var result = "4--4--20";
+        var props = {'sbj_name': '数学', 'content': cont, 'grade_point': 'sequence-simple',
+            'point_type': 'seq-repeat3', 'level': constants.QUESTION_LEVEL_ADVANCED,
+            'answer': result, 'type': 'repeat3'};
+        var q = util.createQuestion(props);
+        seqs.push(q);
+
+        // fibonacci sequence
+        var cont = "1, 1, 2, 3, 5, 8, $ANSWER, 21, $ANSWER, 55";
+        var result = "13--34";
+        var props = {'sbj_name': '数学', 'content': cont, 'grade_point': 'sequence-simple',
+            'point_type': 'seq-fibonacci', 'level': constants.QUESTION_LEVEL_ADVANCED,
+            'answer': result, 'type': 'fibonacci'};
+        var q = util.createQuestion(props);
+        seqs.push(q);
+
+        // prev-3-sum sequence
+        var cont = "1, 1, 1, 3, 5, 9, $ANSWER, 31";
+        var result = "13--34";
+        var props = {'sbj_name': '数学', 'content': cont, 'grade_point': 'sequence-simple',
+            'point_type': 'seq-prev-3-sum', 'level': constants.QUESTION_LEVEL_ADVANCED,
+            'answer': result, 'type': 'prev-3-sum'};
+        var q = util.createQuestion(props);
+        seqs.push(q);
+
+        // tuple sequence 1
+        cont = "(1, 2, 3), (2, 4, 5), (3, 6, 7), ($ANSWER, $ANSWER, $ANSWER)";
+        result = "4--8--9";
+        props = {'sbj_name': '数学', 'content': cont, 'grade_point': 'sequence-simple',
+            'point_type': 'seq-tuple', 'level': constants.QUESTION_LEVEL_ADVANCED,
+            'answer': result, 'type': 'tuple'};
+        q = util.createQuestion(props);
+        seqs.push(q);
+
+        // tuple sequence 2
+        cont = "(1, 3, 4), (3, 5, 8), (5, 7, 12), ($ANSWER, $ANSWER, $ANSWER)";
+        result = "7--9--16";
+        props = {'sbj_name': '数学', 'content': cont, 'grade_point': 'sequence-simple',
+            'point_type': 'seq-tuple', 'level': constants.QUESTION_LEVEL_ADVANCED,
+            'answer': result, 'type': 'tuple'};
+        q = util.createQuestion(props);
+        seqs.push(q);
+
+        // tuple sequence 3
+        cont = "(1, 3), (4, 6), (7, 9), (10, 12), ($ANSWER, $ANSWER)";
+        result = "13--15";
+        props = {'sbj_name': '数学', 'content': cont, 'grade_point': 'sequence-simple',
+            'point_type': 'seq-tuple', 'level': constants.QUESTION_LEVEL_ADVANCED,
+            'answer': result, 'type': 'tuple'};
+        q = util.createQuestion(props);
+        seqs.push(q);
+
+        return seqs;
+    }
 
     this.setAnswerInSeq = function(seq)
     {

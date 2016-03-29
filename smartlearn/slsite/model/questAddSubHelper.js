@@ -3,8 +3,10 @@
  */
 
 load('commUtil.js');
+load('constants.js');
 
 util = new CommUtil();
+constants = new Constants();
 
 function QuestAddSubHelper()
 {
@@ -65,10 +67,10 @@ add_less_20 = function(i, j)
     var sum = i + j;
     var questArry = [i, '+', j, '=', sum];
     var q = getQuestFromArry(questArry, 2);
-    q.grade_point = 'addsub-less-20';
+
     q.type = 'simple';
 
-    var quest = null;
+    var quest = null;  q.grade_point = 'addsub-less-20';
     if ( sum <= 10 )
     {
         var rd = Math.floor(Math.random() * 101);
@@ -248,8 +250,17 @@ getQuestFromArry = function(questArry, nCount)
     questStr = questStr.trim();
     print('question string: ' + questStr);
     print('question answer: ' + result);
+    var level = constants.QUESTION_LEVEL_BASIC;
+    if ( anspos != nCount )
+    {
+        level = constants.QUESTION_LEVEL_MEDIUM;
+        if ( nCount > 2 )
+        {
+            level = constants.QUESTION_LEVEL_ADVANCED;
+        }
+    }
     var props = {'sbj_name':'数学', 'content':questStr, 'answer':result,
-                 'difficulty':'easy', 'type':'simple'};
+                 'level':level, 'type':'simple'};
     var q = util.createQuestion(props);
     return q;
 };
@@ -373,7 +384,7 @@ genAddQuestsUpper100 = function(num)
         var cont = a1 + " + " + a2 + " = $ANSWER";
         var sbjpts = getAddSbjPoints(a1, a2);
         var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'subtract-4',
-                     'point_type':'subtract', 'difficulty':'easy',
+                     'point_type':'subtract', 'level':constants.QUESTION_LEVEL_BASIC,
                      'answer':sumstr.toString(), 'type':'simple'};
         var q = util.createQuestion(props);
         if ( sbjpts == 'addition-5' && i < num )
@@ -444,7 +455,7 @@ genSubtQuestsUpper100 = function(num)
         var cont = s1 + " - " + s2 + " = $ANSWER";
         var sbjpts = getSubtrSbjPoints(s1, s2);
         var props = {'sbj_name':'数学', 'content':cont, 'grade_point':sbjpts,
-                     'point_type':'subtract', 'difficulty':'easy',
+                     'point_type':'subtract', 'level':constants.QUESTION_LEVEL_BASIC,
                      'answer':subtstr, 'type':'simple'};
         var q = util.createQuestion(props);
         if ( sbjpts == 'subtract-5' && i < num )

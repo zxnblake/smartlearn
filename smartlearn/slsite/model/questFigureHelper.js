@@ -68,7 +68,7 @@ function QuestFigureHelper()
             var cont = this.QUESTION_TEXT;
             var quest_and_answer = this.makeQuestsAndAnswers(picArry, picStat, 3);
             var props = {'sbj_name':'数学', 'content':cont, 'grade_point':'figure-simple',
-                 'point_type':'figure-basic-direction', 'difficulty':'easy',
+                 'point_type':'figure-basic-direction', 'level':'basic',
                  'answer':quest_and_answer.answer, 'type':'complex_textdesc_pic_selection',
                  'quest_text':quest_and_answer.quest, 'answer_options':quest_and_answer.answer_options,
                  'content_pic':cont_pics};
