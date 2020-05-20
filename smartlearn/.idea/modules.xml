@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/smartlearn.iml" filepath="$PROJECT_DIR$/.idea/smartlearn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/smartlearn.iml" filepath="$PROJECT_DIR$/smartlearn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/smartlearn.web/smartlearn.web.iml" filepath="$PROJECT_DIR$/smartlearn.web/smartlearn.web.iml" />
     </modules>
   </component>
 </project>
-
