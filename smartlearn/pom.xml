@@ -17,7 +17,7 @@
 	  <httpclient.version>4.5.6</httpclient.version>
 	  <tinkerpop.version>3.3.3</tinkerpop.version>
 	  <commons.codec.version>1.12</commons.codec.version>
-	  <netty4.version>4.1.29.Final</netty4.version>
+	  <netty4.version>4.1.42.Final</netty4.version>
 	  <log4j.version>2.11.2</log4j.version>
 	  <slf4j.version>1.7.25</slf4j.version>
 	  <logback.version>1.2.3</logback.version>
