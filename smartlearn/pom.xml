@@ -26,7 +26,7 @@
 	  <fastjson.version>1.2.57</fastjson.version>
   	  <es.version>6.3.2</es.version>
 	  <springboot.version>2.1.5.RELEASE</springboot.version>
-	  <spring.version>5.1.7.RELEASE</spring.version>
+	  <spring.version>6.0.0</spring.version>
       <ump.version>6.1.3</ump.version>
   </properties>
   
